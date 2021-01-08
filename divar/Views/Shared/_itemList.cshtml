@@ -1,0 +1,181 @@
+﻿@model  divar.ViewModel.itemList.itemListVM
+@{
+    if (@Model.data.listads.Count() > 0)
+    {
+        foreach (var item in @Model.data.listads)
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12 itemParent" id="@item.ID">
+                <div class="itemChild">
+                    <p class="title">@item.title &nbsp; (@item.account_type)</p>
+                    <div class="itemContetn" >
+                        <div class="imageHolder">
+                            <img src="@item.image" />
+
+                        </div>
+                        <div class="contetnHolder">
+                            <div class="contentList">
+                                <p>قیمت کل :</p>
+
+                                <p class="activ"> @item.total_amount </p>
+                            </div>
+                            <div class="contentList">
+                                <p> شرکت سازنده :</p>
+                                <p class="activ">@item.companyname</p>
+
+                            </div>
+                            @*<div style="display:flex">
+                <div class="contentList">
+                    <p> تاریخ تحویل :</p>
+                    <p class="activ">@item.end_date</p>
+
+                </div>
+
+
+
+            </div>
+
+
+
+            <div style="display:flex">
+                <div class="contentList">
+                    <p> درصد پیشرفت  :</p>
+
+
+                </div>
+
+
+            </div>*@
+
+
+                        </div>
+
+                    </div>
+                    <div style="display:flex; position:relative;    direction: rtl; padding: 10px 5px;  border-top: 1px solid #ddd;">
+                        <div style="width:70%; display:flex; align-items:center">
+                            @*<p style="display:inline-block; width:43%;margin:0"> نوع کاربری : @item.account_type  </p>*@
+                            <p style="display:inline-block; width:100%;margin:0"> تاریخ آگهی : @item.time  </p>
+                           
+                        </div>
+                        <div style="width:30%;display:flex; direction:ltr">
+                            @{
+                                if (item.saved == "1")
+                                {
+                                    <img class="itemimageRemove savedItem" id="@item.ID" src="~/images/saved.png" />
+                                    <img class="itemimageAdd unsavedItem" id="@item.ID" src="~/images/unsaved.png" style="display:none;" />
+                                    <div style="margin-left:10px" class="progress-bar position" data-percent=@item.project_process_percentage></div>
+                                }
+                                else
+                                {
+                                    <img class="itemimageRemove savedItem" id="@item.ID" src="~/images/saved.png" style="display:none;" />
+                                    <img class="itemimageAdd unsavedItem" id="@item.ID" src="~/images/unsaved.png" style="" />
+                                    <div  style="margin-left:10px" class="progress-bar position" data-percent=@item.project_process_percentage></div>
+                                }
+                            }
+                        </div>
+                       
+
+                        
+
+                    </div>
+                </div>
+
+            </div>
+        }
+    }
+    else
+    {
+       <div style="padding:50px;text-align:center; border:1px solid #eee;border-radius:5px ">موردی برای نمایش وجود ندارد</div>
+    }
+
+
+
+
+    <script>
+
+        $(".progress-bar").loading();
+        $(".itemParent").click(function () {
+            $("#loading").fadeIn();
+            var id = $(this).attr('id');
+            window.location.href = "/Home/Detail?id=" + id;
+        })
+        $(".itemimageAdd").click(function () {
+            event.stopPropagation();
+            var item, siblin;
+            item = $(this);
+            siblin = $(this).siblings("img");
+
+            var id = $(this).attr('id');
+
+            $.ajax({
+                url: '/Home/SaveItem',
+                dataType: 'html',
+                data: {
+                    id: id,
+                    value: "1"
+                },
+                success: function (data) {
+
+                    if (data != "") {
+
+
+                        item.toggle();
+                        siblin.toggle();
+                    }
+                    else {
+                        $("#loginModal").modal('toggle');
+                    }
+
+
+                }
+            })
+
+
+
+        });
+        $(".itemimageRemove").click(function () {
+            event.stopPropagation();
+            var item, siblin;
+            item = $(this);
+            siblin = $(this).siblings("img");
+
+            var id = $(this).attr('id');
+
+            $.ajax({
+                url: '/Home/SaveItem',
+                dataType: 'html',
+                data: {
+                    id: id,
+                    value: "0"
+                },
+                success: function (data) {
+
+                    if (data != "") {
+
+
+                        item.toggle();
+                        siblin.toggle();
+                    }
+                    else {
+                        $("#loginModal").modal('toggle');
+                    }
+
+
+                }
+            })
+
+
+
+        });
+    </script>
+}
+
+@{ 
+    int w = Request.Browser.ScreenPixelsWidth;
+    int h = Request.Browser.ScreenPixelsHeight;
+    if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
+    {
+        <script>
+
+        </script>
+    }
+}

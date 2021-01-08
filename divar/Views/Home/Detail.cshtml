@@ -1,0 +1,471 @@
+﻿@model divar.ViewModel.detail.detailVM
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section scripts{
+
+    <link href="~/Content/flexslider2.css" rel="stylesheet" />
+    <link href="~/Content/lightgallery.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.flexslider2.js"></script>
+    <script src="~/Scripts/lightgallery.min.js"></script>
+
+    <script>
+
+        // Can also be used with $(document).ready()
+        $(document).ready(function () {
+            if ($(window).width() < 960) {
+                $('.flexslider').flexslider({
+                    animation: "slide",
+                    controlNav: false,
+                    direction: "horizontal",
+                    reverse: false,
+                    directionNav: false,
+
+                });
+            }
+            else {
+                $('.flexslider').flexslider({
+                    animation: "slide",
+                    controlNav: "thumbnails",
+                    direction: "horizontal",
+                    reverse: false,
+                    directionNav: false,
+
+                });
+            }
+
+        });
+    </script>
+
+}
+@{
+    int w = Request.Browser.ScreenPixelsWidth;
+    int h = Request.Browser.ScreenPixelsHeight;
+    if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
+    {
+        <style>
+            .parent {
+                border-radius: 10px;
+                box-shadow: 2px 2px 5px -1px rgba(148,149,153,1);
+                margin: 10px;
+                margin-top: -20px;
+                border: 1px solid #eee;
+                background-color:white;
+                text-align:center;
+
+            }
+                .parent p{
+                    margin-top:20px
+                }
+               
+               .bold {
+                    font-weight:600
+                }
+                    .parent p.big {
+                        font-size:16px
+                    }
+                .img-responsive {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+            .thumb-image {
+                height: 200px;
+            }
+            .flexslider {
+                margin-bottom: 0px;
+                border-radius: 7px;
+                border: 2px solid #82DEED;
+                margin: 10px;
+                padding: 5px;
+            }
+            .itemrow {
+                padding: 7px;
+                border-radius: 7px;
+                border: 2px solid #82DEED;
+                text-align:right
+            }
+        </style>
+        <div class="parent row">
+
+            <p class="bold big">@Model.detail.title</p>
+            <div id="slidholder" class="col-md-12 col-sm-12 col-lg-12 slidemultiple" style="padding:0; visibility: visible; animation-delay: 0.5s; animation-name: slideInUp; background-color:#fff;">
+
+                <div class="flexparent">
+                    <div class="flexslider colored" style="   ">
+                        <!-- FlexSlider -->
+                        <!-- //FlexSlider-->
+                        <ul class="slides">
+                            @{
+                                string image1 = @Model.detail.image1 != "" ? @Model.detail.image1 : "/images/placeHolder.png";
+                                string image2 = @Model.detail.image2 != "" ? @Model.detail.image2 : "/images/placeHolder.png";
+                                string image3 = @Model.detail.image3 != "" ? @Model.detail.image3 : "/images/placeHolder.png";
+                                string image4 = @Model.detail.image4 != "" ? @Model.detail.image4 : "/images/placeHolder.png";
+                                string image5 = @Model.detail.image5 != "" ? @Model.detail.image5 : "/images/placeHolder.png";
+                                <li data-thumb="">
+                                    <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                        <img style="width:100%; height:100%; object-fit:scale-down" src="@image1" data-imagezoom="true" class="img-responsive ">
+                                    </div>
+                                </li>
+                                <li data-thumb="@Model.detail.image2">
+                                    <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                        <img style="width:100%; height:100%; object-fit:scale-down" src="@image2" data-imagezoom="true" class="img-responsive ">
+                                    </div>
+                                </li>
+                                <li data-thumb="@Model.detail.image3">
+                                    <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                        <img style="width:100%; height:100%; object-fit:scale-down" src="@image3" data-imagezoom="true" class="img-responsive ">
+                                    </div>
+                                </li>
+                                <li data-thumb="@Model.detail.image4">
+                                    <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                        <img style="width:100%; height:100%; object-fit:scale-down" src="@image4" data-imagezoom="true" class="img-responsive ">
+                                    </div>
+                                </li>
+                                <li data-thumb="@Model.detail.image5">
+                                    <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                        <img style="width:100%; height:100%; object-fit:scale-down" src="@image5" data-imagezoom="true" class="img-responsive ">
+                                    </div>
+                                </li>
+
+                            }
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+           
+
+            <div class="col-md-12 col-sm-12 col-lg-12">
+                <p class="itemrow">
+                    <span class="right">تاریخ شروع : </span>
+                    <span class="left bold">@Model.detail.start_date</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">درصد پیشرفت</span>
+                    <span class="bold">@Model.detail.project_process_percentage</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">تاریخ تحویل</span>
+                    <span class="bold">@Model.detail.end_date</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">تعداد واحد</span>
+                    <span class="bold">@Model.detail.number_of_units</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">متراژ واحد</span>
+                    <span class="bold">@Model.detail.unit_area</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right"> تعداد طبقات </span>
+                    <span class="bold">@Model.detail.floors_count</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">استان</span>
+                    <span class="bold">@Model.detail.state</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">شهر/منطقه</span>
+                    <span class="bold">@Model.detail.city/@Model.detail.region</span>
+                </p>
+                <p class="itemrow">
+                    <span class="right">نوع کاربری</span>
+                    <span class="bold">@Model.detail.account_type</span>
+                </p>
+                @if (Model.detail.is_metrics_based_price == "0")
+                {
+                    <p class="itemrow">
+                        <span class="right"> مجموع واریزی ها</span>
+                        <span class="bold">@Model.detail.initial_deposit_amount</span>
+                    </p>
+                    <p class="itemrow">
+                        <span class="right"> حق امتیاز</span>
+                        <span class="bold">@Model.detail.premium_amount</span>
+                    </p>
+
+                    <p class="itemrow">
+                        <span class="right"> کل</span>
+                        <span class="bold">@Model.detail.total_amount</span>
+                    </p>
+                }
+                else
+                {
+                    <p class="itemrow">
+                        <span class="right">مبلغ هر متر مربع</span>
+                        <span class="bold">@Model.detail.metrics_based_price</span>
+                    </p>
+
+                }
+
+                <p class="itemrow">
+                    <span class="right">نام شرکت شازنده</span>
+                    <span class="bold">@Model.detail.companyname</span>
+                </p>
+                <p class="itemrow" style="height:150px">
+                    <span class="right">آدرس</span>
+                    <span class="bold">@Model.detail.address</span>
+                </p>
+                <p class="itemrow" style="height:150px">
+                    <span class="right">توضیحات</span>
+                    <span class="bold">@Model.detail.desc_ads</span>
+                </p>
+
+                <p class="itemrow" style="height:250px ; background-color:#eee; text-align:center">
+                    <span class="right">موقعیت پروژه ست نشده است</span>
+
+                </p>
+
+                <div class="row">
+                    <p style="background-color:aqua;width:44%; padding: 20px 0;    display: inline-block;border-radius: 6px;margin-top:0 "> روزنامه رسمی شرکت سازنده </p>
+                    <p style="background-color:aqua;width:44%; padding: 20px 0;    display: inline-block;border-radius: 6px;margin-top:0"> درباره شرکت سازنده </p>
+                </div>
+
+                <textarea style="height:200px; width:100%; text-align:right; padding:10px" placeholder="نظر خود را وارد کنید"></textarea>
+                <p style="width:100%; padding:10px; background-color:green; color:white; border-radius:5px;">ثبت نظر</p>
+
+
+
+            </div>
+        </div>
+
+    }
+    else
+    {
+
+        <div style="display:flex; width:100%; height:100%; background-color:white; padding:50px 20%">
+
+            <div id="slidholder" class="col-md-12 col-sm-12 col-lg-6 slidemultiple" style=" visibility: visible; animation-delay: 0.5s; animation-name: slideInUp; background-color:#fff;">
+
+                <div class="flexparent">
+                    <div class="flexslider" style="margin-bottom:0px">
+                        <!-- FlexSlider -->
+                        <!-- //FlexSlider-->
+
+                        <ul class="slides">
+                            @{
+                                <li data-thumb="">
+                                    <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                        <img style="width:100%; height:100%; object-fit:scale-down" src="@Model.detail.image1" data-imagezoom="true" class="img-responsive ">
+                                    </div>
+                                </li>
+                                if (@Model.detail.image2 != "")
+                                {
+                                    <li data-thumb="@Model.detail.image2">
+                                        <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                            <img style=" object-fit:scale-down" src="@Model.detail.image2" data-imagezoom="true" class="img-responsive ">
+                                        </div>
+                                    </li>
+                                }
+                                if (@Model.detail.image3 != "")
+                                {
+                                    <li data-thumb="@Model.detail.image3">
+                                        <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                            <img style=" object-fit:scale-down" src="@Model.detail.image3" data-imagezoom="true" class="img-responsive ">
+                                        </div>
+                                    </li>
+                                }
+                                if (@Model.detail.image4 != "")
+                                {
+                                    <li data-thumb="@Model.detail.image4">
+                                        <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                            <img style=" object-fit:scale-down" src="@Model.detail.image4" data-imagezoom="true" class="img-responsive ">
+                                        </div>
+                                    </li>
+                                }
+
+                                if (@Model.detail.image5 != "")
+                                {
+                                    <li data-thumb="@Model.detail.image5">
+                                        <div class="thumb-image imageitself" style=" margin:auto ; padding:0px;">
+                                            <img style=" object-fit:scale-down" src="@Model.detail.image5" data-imagezoom="true" class="img-responsive ">
+                                        </div>
+                                    </li>
+                                }
+                                    
+
+                            }
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <div class="commentArea">
+                    <textarea placeholder="نظر خود را بنویسید"></textarea>
+                </div>
+
+            </div>
+            <div id="slidholder" class="col-md-12 col-sm-12 col-lg-6 slidemultiple" style=" visibility: visible; animation-delay: 0.5s; animation-name: slideInUp; background-color:#fff;">
+
+                <style>
+                    .commentArea {
+                        width: 100%
+                    }
+
+                        .commentArea textarea {
+                            padding: 10px;
+                            text-align: right;
+                            height: 200px;
+                            width: 100% !important;
+                            border-color: #eee;
+                            border-radius: 5px;
+                        }
+
+                    .rowitem {
+                        padding: 5px;
+                        margin-bottom: 0px;
+                        height: 35px;
+                        border-bottom: 1px solid #eee;
+                        display: flex;
+                        align-items: center;
+                        direction: rtl;
+                    }
+
+                        .rowitem .right {
+                            float: right;
+                        }
+
+                        .rowitem .left {
+                            float: left;
+                            float: left;
+                            flex: 1;
+                            text-align: left;
+                        }
+
+                    .dataholder {
+                        text-align: right;
+                    }
+
+                        .dataholder p {
+                            text-align: right;
+                            direction: rtl;
+                        }
+
+                        .dataholder .title {
+                            font-size: 18px;
+                            font-weight: 600
+                        }
+
+                        .dataholder .description {
+                            font-size: 15px;
+                            font-weight: 600;
+                            margin-top: 25px
+                        }
+
+                        .dataholder .date {
+                            margin-bottom: 15px;
+                            font-size: 14px;
+                        }
+
+                        .dataholder .buttonHolder {
+                            display: flex;
+                            direction: rtl;
+                            margin-bottom: 15px
+                        }
+
+                    .buttonHolder div {
+                        margin-left: 15px
+                    }
+                </style>
+                <div class="dataholder">
+                    <p class="title">@Model.detail.title</p>
+                    <p class="date">@Model.detail.time</p>
+                    <div class="buttonHolder">
+                        <div class="btn btn-danger" style="background-color:aqua; border-color:aqua;color:black">درباره سازنده شرکت</div>
+                        <div class="btn btn-success">استعلام شرکت سازنده</div>
+                        <i class="glyphicon glyphicon-heart"></i>
+                    </div>
+
+                    <p class="rowitem">
+                        <span class="right">تاریخ شروع</span>
+                        <span class="left">@Model.detail.start_date</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">درصد پیشرفت</span>
+                        <span class="left">@Model.detail.project_process_percentage</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">تاریخ تحویل</span>
+                        <span class="left">@Model.detail.end_date</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">تعداد واحد</span>
+                        <span class="left">@Model.detail.number_of_units</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">متراژ هر واحد</span>
+                        <span class="left">@Model.detail.unit_area</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">استان</span>
+                        <span class="left">@Model.detail.state</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">شهر/منطقه</span>
+                        <span class="left">@Model.detail.city/@Model.detail.region</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">نوع کاربری</span>
+                        <span class="left">@Model.detail.account_type</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">مبلغ واریز اولیه</span>
+                        <span class="left">@Model.detail.initial_deposit_amount</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">مبلغ حق امتیاز</span>
+                        <span class="left">@Model.detail.premium_amount</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">مبلغ هر قسط</span>
+                        <span class="left">@Model.detail.amount_per_installment</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">مبلغ کل</span>
+                        <span class="left">@Model.detail.total_amount</span>
+                    </p>
+                    <p class="rowitem">
+                        <span class="right">نام شرکت شازنده</span>
+                        <span class="left">@Model.detail.companyname</span>
+                    </p>
+                    <p class="description">توضیحات</p>
+                    <p>
+                        @Model.detail.desc_ads
+                    </p>
+                    <p class="">آدرس :</p>
+                    <p>
+                        @Model.detail.address
+                    </p>
+                </div>
+
+
+
+
+            </div>
+
+        </div>
+
+
+
+        <script>
+    $(".flexslider").click(function () {
+
+        var IMGList = [{ "src": "@Model.detail.image1", "thumb":"@Model.detail.image1"}, { "src": "@Model.detail.image2", "thumb":"@Model.detail.image2"}] ;
+        $(this).lightGallery({
+            dynamic: true,
+            dynamicEl: IMGList,
+            startClass: 'lg-start-zoom'
+
+        })
+    })
+        </script>
+    }
+}

@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewBag.Title = "list";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script>
+    function getSaved() {
+        $.ajax({
+            url: "/Home/GetSaved",
+            dataType: 'html',
+            success: function (data) {
+                $("#mainHolder").html(data);
+            }
+        })
+    }
+    function getOwn() {
+        $.ajax({
+            url: "/Home/GetOwn",
+            dataType: 'html',
+            success: function (data) {
+                $("#mainHolder").html(data);
+            }
+        })
+    }
+    function GetLast() {
+        $.ajax({
+            url: "/Home/GetLastVisit",
+            dataType: 'html',
+            success: function (data) {
+                $("#mainHolder").html(data);
+            }
+        })
+    }
+    
+
+    var value = '@ViewBag.message';
+    switch (value) {
+             case "recentCall":
+            GetLast();
+            $(document).ready(function () {
+                $(".fa-user").addClass("act")
+            })
+                break;
+            case "savedItem":
+            getSaved()
+            $(document).ready(function () {
+                $(".fa-save").addClass("act")
+            })
+                break;
+            case "mydivar":
+            getOwn();
+            $(document).ready(function () {
+                $(".fa-user").addClass("act")
+            })
+                break;
+            default:
+            // code block
+     }
+                   // getSaved();
+
+   
+</script>
+
+<div id="mainHolder">
+
+
+
+
+</div>
+<script>
+    
+</script>

@@ -1,0 +1,28 @@
+﻿@model divar.ViewModel.pageVM.contentPageVM
+@{
+    ViewBag.Title = "list";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section scripts{
+    <script>
+   
+
+    $(document).ready(function () {
+        $(".fa-cog").addClass("act")
+    })
+    </script>
+}
+
+
+    <div id="mainHolder">
+        <div style="padding:10px; text-align:right">
+            @Html.Raw(Model.data.data_content)
+
+        </div>
+      
+    </div>
+
+
+

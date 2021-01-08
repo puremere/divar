@@ -1,0 +1,140 @@
+﻿
+@{
+                /**/
+
+                ViewBag.Title = "setting";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    int w = Request.Browser.ScreenPixelsWidth;
+    int h = Request.Browser.ScreenPixelsHeight;
+    if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
+    {
+        <style>
+            .profholder {
+                position: fixed;
+                background-color: white;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+            }
+
+                .profholder .header {
+                    background-color: #82DEED;
+                    width: 100%;
+                    color: #8d8d8d;
+                    padding: 15px;
+                    text-align: right;
+                    font-size: 18px;
+                    font-weight: 600;
+                }
+
+                .profholder .content {
+                    padding: 15px;
+                    text-align: right;
+                }
+
+                .profholder .button {
+                    border-radius: 15px;
+                    padding: 10px;
+                    border: 1px solid red;
+                    width: 40%;
+                    text-align: center;
+                    margin: 5px;
+                    font-weight: 600;
+                    color: red;
+                }
+
+            .devider {
+                width: 100%;
+                margin-top: 20px;
+                border-bottom: 1px solid #ddd
+            }
+
+            .profholder p {
+                float: right;
+                display: inline-block
+            }
+
+            .profholder i {
+                float: left;
+                display: inline-block
+            }
+
+            .profholder .buttHolder {
+                margin: 0;
+                padding: 20px;
+                font-weight: 600
+            }
+        </style>
+        <div class="profholder">
+            <div class="header">
+                خانه دان
+            </div>
+            <div class="deleteLastCall content" style="cursor:pointer">حذف تاریخچه جستجو</div>
+           
+            <div class="devider" style="margin-top:2px"></div>
+            <div id="guide" class="buttHolder">
+
+                <p>پشتیبانی و قوانین</p>
+                <i class="fal fa-chevron-left"></i>
+            </div>
+            <div id="contactus" class="buttHolder">
+
+                <p>تماس با ما</p>
+                <i class="fal fa-chevron-left"></i>
+            </div>
+            <div id="about_us" class="buttHolder">
+
+                <p> درباره ما</p>
+                <i class="fal fa-chevron-left"></i>
+            </div>
+            <div class="devider"></div>
+        </div>
+
+        <script>
+            $("#deleteLastCallButt").click(function () {
+                $.ajax({
+                    url: '/Home/isLogedIn',
+                    dataType: 'html',
+                    success: function (data) {
+
+                        if (data != "") {
+                            $.ajax({
+                                url: '/Home/deleteLastCall',
+                                dataType: 'html',
+                                success: function () {
+                                    $("#deleteModel").modal('toggle');
+                                    alert("با موفقیت انجام شد")
+                                }
+                            })
+                        }
+                        else {
+                            $("#loginModal").modal('toggle');
+                        }
+
+
+                    }
+                })
+            })
+            $(".deleteLastCall").click(function () {
+               // $("#deleteModel").modal('toggle');
+
+                
+               
+            })
+            $(".buttHolder").click(function () {
+                var id = $(this).attr('id');
+                window.location.href = "/Home/content?id=" + id;
+            })
+        </script>
+        <script>
+            $(document).ready(function () {
+                $(".fa-cog").addClass("act")
+            })
+        </script>
+
+    }
+}

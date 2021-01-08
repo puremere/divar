@@ -4,39 +4,988 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
-</head>
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
 
+    @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+
+
+
+    @{
+        int w = Request.Browser.ScreenPixelsWidth;
+        int h = Request.Browser.ScreenPixelsHeight;
+        if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
+        {
+
+            <link href="~/Content/ProductListStyle.css" rel="stylesheet" />
+
+
+            <link href="~/Content/persian-datepicker.css" rel="stylesheet" />
+            <script src="~/Scripts/persian-date.js"></script>
+            <script src="~/Scripts/persian-datepicker.js"></script>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $(".projectDate").pDatepicker();
+                });
+            </script>
+            <link href="~/Content/bootstrap-slider.css" rel="stylesheet" />
+            <script src="~/Scripts/bootstrap-slider.min.js"></script>
+
+            <script>
+                $("#lableToggle input").click(function () {
+                    $("#loading").css("display", "block");
+                    let value = "0";
+                    if ($(this).is(':checked')) {
+                        value = "1"
+                    }
+                    $.ajax({
+                        url: '/Home/changeAvailableStatus',
+                        data: {
+                            status: value,
+
+                        },
+                        dataType: 'html',
+                        success: function () {
+                            //location.reload();
+
+
+                        },
+                        error: function () {
+
+                        }
+                    });
+
+                })
+            </script>
+
+            <link rel="stylesheet" href="https://cdn.map.ir/web-sdk/1.4.2/css/mapp.min.css">
+            <link rel="stylesheet" href="https://cdn.map.ir/web-sdk/1.4.2/css/fa/style.css">
+
+            <link href="~/Content/jQuery-plugin-progressbar.css" rel="stylesheet" />
+            <script src="~/Scripts/jQuery-plugin-progressbar.js"></script>
+        }
+    }
+
+    
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome-all.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: white !important;
+        }
+
+        .itemimage {
+            position: absolute;
+            top: 5px;
+            left: 10px
+        }
+
+        .contentList {
+            width: 100%;
+            display: inline-block;
+            padding: 5px;
+            direction: rtl
+        }
+
+        .itemParent {
+            margin: 0;
+            padding: 0 15px;
+            cursor: pointer;
+            border-radius: 7px;
+            float: right;
+            margin-bottom: 30px
+        }
+
+        .itemChild {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px -1px rgba(148,149,153,1);
+            direction: rtl;
+        }
+
+            .itemChild p.activ {
+                font-weight: 600;
+                white-space: nowrap;
+                overflow: hidden
+            }
+
+            .itemChild .title {
+                padding: 10px;
+                text-align: center;
+                font-weight: 600;
+                background-color: aqua;
+                border-radius: 7px 7px 0 0;
+                color: #8d8d8d
+            }
+
+        .itemContetn {
+            display: flex;
+        }
+
+        .imageHolder {
+            object-fit: fill;
+            width:50%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            padding:5px;
+            object-fit:cover
+        }
+
+            .imageHolder img {
+                height: 100%;
+                width: 100%;
+                margin:auto;
+            }
+
+        .contetnHolder {
+            flex: 1;
+            text-align: right;
+            line-height: 1.5;
+            padding: 5px 10px 0px;
+            width: 100%
+        }
+
+            .contetnHolder p {
+                margin: 0
+            }
+
+        .checkboxFilter {
+            padding: 3px 3%;
+        }
+
+        #progressSection {
+            padding: 20px
+        }
+
+        .inputfield {
+            margin: 20px auto;
+            text-align: center
+        }
+
+        .containner {
+            display: block;
+            position: relative;
+            padding-right: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            /* Hide the browser's default checkbox */
+            .containner input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+            }
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 2px solid green;
+            border-radius: 1px;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .containner:hover input ~ .checkmark {
+            background-color: white;
+        }
+
+        /* When the checkbox is checked, add a blue background */
+        .containner input:checked ~ .checkmark {
+            background-color: green;
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the checkmark when checked */
+        .containner input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Style the checkmark/indicator */
+        .containner .checkmark:after {
+            left: 7px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    </style>
+    <style>
+        .addItem {
+            cursor: pointer;
+            background-color: #576C79;
+            position: fixed;
+            bottom: 50px;
+            left: 35%;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .inputsection {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+            .inputsection input {
+                text-align: center
+            }
+
+            .inputsection .pish {
+                border: 1px solid #ddd;
+                background-color: #eee;
+                color: #4d4d4d;
+                text-align: center;
+                padding: 6px 16px
+            }
+
+        .messageCode {
+            padding: 10px 20px;
+            background-color: #e5f9e7;
+            color: #1ebc30;
+            box-shadow: inset 0 0 0 1px #1ebc30, 0 0 0 0 transparent;
+            margin-top: 15px;
+            text-align: center;
+            width: 100%
+        }
+
+        .message {
+            padding: 10px 20px;
+            background-color: #fff8db;
+            color: #b58105;
+            box-shadow: inset 0 0 0 1px #b58105, 0 0 0 0 transparent;
+            text-align: center;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 15px 35px;
+            background-color: white;
+            position: fixed;
+            overflow: visible;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            max-height: 150px;
+            max-width: 350px;
+            direction: rtl;
+            z-index: 999999
+        }
+
+        .level2 {
+            display: none;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="border: 0px">
+                    <h5 class="modal-title" id="exampleModalLabel" style="direction:rtl">
+                        ورود و ثبت نام
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="float:left">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </h5>
+
+                </div>
+                <div class="modal-body">
+                    <div class="message">
+                        برای استفاده از خانه دان نیاز است وارد حساب کاربری خود شوید
+                    </div>
+                    <div class="messageCode level2">
+                        کد تایید برای ورود به خانه دان برای شما ارسال شد
+                    </div>
+                    <div class="inputsection ">
+                        <div class="pish level1">+98</div>
+                        <div class="inputHolder">
+                            <input id="phoneInput" class="form-control level1" style="border-radius:0" placeholder="" />
+                        </div>
+                        <div class="inputHolder">
+                            <input id="codeInput" class="form-control level2" style="border-radius:0" placeholder="کد تایید 6 رقمی" />
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+                <div class="modal-footer" style="border:0px; text-align:center">
+
+                    <button type="button" class="btn btn-danger  codeButt level1" style="">دریافت کد تایید</button>
+                    <button type="button" class="btn btn-danger  loginButt level2" style="min-width:150px">ورود</button>
+
+                    <p class="level2" id="phoneHolder" style="  width: 100%; margin: 10px 0 5px;">09194594505</p>
+                    <p class="level2" id="changePhone" style="color:red;cursor:pointer">تغییر شماره تلفن</p>
+
+                </div>
+
+            </div>
+        </div>
+        <script>
+
+            let phone;
+            $(".codeButt").click(function () {
+                phone = $("#phoneInput").val();
+                // برو کدو بفرست تو برگشت این کارارو کن
+                $("#loading").fadeIn();
+                $.ajax({
+                    url: '/Home/getCode',
+                    dataType: 'html',
+                    data: {
+                        phone: phone,
+                        code: ''
+                    },
+                    success: function (data) {
+                        $("#loading").fadeOut();
+                        $("#phoneHolder").text(phone);
+                        $(".level1").css("display", "none");
+                        $(".level2").css("display", "inline-block");
+                    }
+                })
+
+
+            })
+            $("#changePhone").click(function () {
+                $(".level1").css("display", "inline-block");
+                $(".level2").css("display", "none");
+
+            })
+            $(".loginButt").click(function () {
+                var code = $("#codeInput").val();
+                $("#loading").fadeIn();
+                $.ajax({
+                    url: '/Home/sendCode',
+                    dataType: 'html',
+                    data: {
+                        phone: phone,
+                        code: code
+                    },
+                    success: function (data) {
+                        if (data != "") {
+                            $("#loading").fadeOut();
+                           // $("#loginModal").modal('toggle');
+                            location.reload();
+                        }
+                        else {
+                            $("#loading").fadeOut();
+                            alert(data);
+                        }
+                       
+                    }
+                })
+            })
+        </script>
+    </div>
+    <div id="loading" style="display:none">
+        <div style="padding:15px 35px; background-color:white;position:fixed;overflow: visible;margin: auto;top: 0;left: 0; bottom: 0; right: 0;max-height:150px; max-width:250px">
+
+            @*<img style="max-width:80px; display:block; margin:auto" src="" />*@
+            <p>لطفا کمی صبر نمایید ...</p>
+            <img src="~/images/loading.gif" style="display:block; margin:auto; margin-top:15px" />
+
+        </div>
+    </div>
+
+    @{
+
+        if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
+        {
+
+            <style>
+                body {
+                    padding: 0;
+                }
+
+                .pad10 {
+                    padding: 10px;
+                }
+
+                .buttonHolder {
+                    background-color: white;
+                    padding: 7px;
+                    display: flex;
+                    direction: rtl;
+                    margin: -20px 10px 10px;
+                    border-radius: 7px;
+                    box-shadow: 2px 2px 5px -1px rgba(148,149,153,1);
+                }
+
+
+                .filter {
+                    border-left: 1px solid #ddd;
+                    width: 90%;
+                    display: flex;
+                    align-items: center;
+                    padding: 5px;
+                }
+
+                    .filter div {
+                        display: inline-block;
+                        width: 100%;
+                        padding: 5px;
+                        color: black;
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+
+                .city {
+                    border-left: 1px solid #ddd;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    padding: 5px;
+                }
+
+                    .city div {
+                        display: inline-block;
+                        width: 100%;
+                        color: black;
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+
+                .province {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    padding: 5px;
+                }
+
+                    .province div {
+                        display: inline-block;
+                        width: 100%;
+                        padding: 5px;
+                        color: black;
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+
+
+
+                .appheader {
+                    background-color: #82DEED;
+                    padding: 5% 5% 9%;
+                    display: flex;
+                }
+
+                    .appheader div i {
+                        padding: 10px 12px;
+                        border-radius: 50%;
+                        background-color: white;
+                        color: black;
+                        font-size: 22px;
+                    }
+
+                    .appheader div {
+                        width: 33%;
+                    }
+
+                .alarm {
+                    text-align: left;
+                }
+
+                .search {
+                    text-align: right;
+                }
+
+                .logo {
+                    text-align: center
+                }
+            </style>
+            <div class="appheader">
+                <div class="alarm"><i class="fal fa-bell"></i></div>
+                <div class="logo">
+                    <img style="width:50px;" src="~/images/khanedan.png" />
+                </div>
+                <div class="search"><i class="fal fa-search"></i> </div>
+            </div>
+
+
+            <div id="barmenu" style="display:none; height: 100%; width : 100% ;display:none; position: fixed;top: 0;z-index: 9;background-color:rgba(0, 0, 0, 0);right: 0;">
+                <div id="barmanuholder" style="position:relative; overflow-y:scroll; width:90% ; background-color:white; float:right; height:100%; ">
+
+                    
+                    <div id="filterParent">
+                        <div id="seachHolder" style="width: 80%;margin: auto;margin-top: 20px;">
+                            <input style="text-align:right" class="form-control" placeholder="عبارت مورد نظر خود را بنویسید" />
+                        </div>
+                        <div id="filterHolder">
+
+
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#karbari" role="button" aria-expanded="false" aria-controls="karbari">نوع کاربری</div>
+                                <div class="collapse pad10" id="karbari">
+                                    <div class="panell" id="panel1">
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
+                                            <label class="containner CHcontainer">
+                                                تجاری
+                                                <input type="checkbox" class="classd1">
+                                                <span class="checkmark"></span>
+                                            </label>
+
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
+                                            <label class="containner CHcontainer">
+                                                مسکونی
+                                                <input type="checkbox" class="classd1">
+                                                <span class="checkmark"></span>
+                                            </label>
+
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
+                                            <label class="containner CHcontainer">
+                                                اداری
+                                                <input type="checkbox" class="classd1">
+                                                <span class="checkmark"></span>
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#tahvil" role="button" aria-expanded="false" aria-controls="tahvil">تاریخ تحویل</div>
+                                <div class="collapse pad10" id="tahvil">
+                                    <input type="text" class="form-control projectDate inputfield" />
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#merajserction" role="button" aria-expanded="false" aria-controls="tahvil">متراژ واحد</div>
+                                <div class="collapse pad10" id="merajserction">
+                                    <input id="metraj" type="text" class="form-control  inputfield" />
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#progressSection" role="button" aria-expanded="false" aria-controls="tahvil">درصد پیشرفت پروژه</div>
+                                <div class="collapse pad10" id="progressSection">
+                                    <input style="width:100%" id="ex6" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0" />
+                                    <span style="width:100%" id="ex6CurrentSliderValLabel"> <span id="ex6SliderVal" style="padding:10px 20px;border:1px solid #ddd; margin-left:40%">3</span></span>
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#vahedmablagh" role="button" aria-expanded="false" aria-controls="vahedmablagh">مبلغ واریز</div>
+                                <div class="collapse pad10" id="vahedmablagh">
+                                    <input placeholder="مبلغ از" id="mablaghvarizFrom" type="text" class="form-control  inputfield" />
+                                    <input placeholder="مبلغ تا" id="mablaghvarizFrom" type="text" class="form-control  inputfield" />
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#geshtmablagh" role="button" aria-expanded="false" aria-controls="geshtmablagh">مبلغ اقساط</div>
+                                <div class="collapse pad10" id="geshtmablagh">
+                                    <input placeholder="مبلغ از" id="mablaghGestFrom" type="text" class="form-control  inputfield" />
+                                    <input placeholder="مبلغ تا" id="mablaghGestTo" type="text" class="form-control  inputfield" />
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#kollmablagh" role="button" aria-expanded="false" aria-controls="kollmablagh">مبلغ کل</div>
+                                <div class="collapse pad10" id="kollmablagh">
+                                    <input placeholder="مبلغ از" id="mablaghKollFrom" type="text" class="form-control  inputfield" />
+                                    <input placeholder="مبلغ تا" id="mablaghKollFrom" type="text" class="form-control  inputfield" />
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+                            <div class="accholder filterholder" id="filter1">
+
+
+                                <div class="accordion" data-toggle="collapse" href="#mahdoode" role="button" aria-expanded="false" aria-controls="kollmablagh">انتخاب موقعیت</div>
+                                <div class="collapse pad10" id="mahdoode">
+                                    <div style="display:flex">
+                                        <div style="margin:auto; background-color:aqua; border-color:red;border-color:aqua; color:#8d8d8d; margin-bottom:15px;" id="showMap" class="btn btn-success;">انتخاب</div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="accholder" style="padding:10px">
+                                <div class="row" style="margin:0px; padding:0px 40px">
+                                    <label id="lableToggle" style="display:inline-block" class="switch">
+                                        <input type="checkbox">
+                                        <span class="sliderr round"></span>
+                                    </label>
+                                    <p id="availableTiggle">فقط موارد موجود</p>
+                                </div>
+
+
+
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="accholder" style="padding:10px">
+                            <div class="row" style="margin:0px; padding:5px; text-align:center">
+
+                                <p id="reloadList" class="btn btn-success" style="width:100%; border-color:aqua; color:black; background-color:aqua">تایید</p>
+                            </div>
+
+
+
+
+                        </div>
+                        <script>
+                            $(".accordion").click(function () {
+                                if ($(this).siblings().hasClass("collapse")) {
+
+                                    $(this).siblings().slideDown();
+                                    $(this).siblings().removeClass("collapse")
+                                }
+                                else {
+                                    $(this).siblings().slideUp();
+                                    $(this).siblings().addClass("collapse")
+                                }
+                            })
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+            <div style="margin-bottom:70px">
+                @RenderBody()
+            </div>
+            <style>
+                .appfooter {
+                    position: fixed;
+                    bottom: 0;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    padding: 10px;
+                    background-color:white;
+                }
+                    .appfooter i {
+                        height: 100%;
+                        font-size:18px
+                    }
+                        .appfooter i.act {
+                            color: #82DEED;
+                            
+                        }
+                .imgH {
+                    width:20%;
+                    text-align:center;
+                }
+            </style>
+            <div class="appfooter ">
+                <div class="imgH"> <i class="fa fa-save"></i></div>
+                <div class="imgH"> <i class="fa fa-file"></i></div>
+                <div class="imgH"> <i class="fa fa-home"></i></div>
+                <div class="imgH"> <i class="fa fa-user"></i></div>
+                <div class="imgH"> <i class="fa fa-cog"></i></div>
+
+
+
+            </div>
+            
+            <script>
+                function islogedIn(srt) {
+                    $.ajax({
+                        url: '/Home/isLogedIn',
+                        dataType: 'html',
+                        success: function (data) {
+
+                            if (data != "") {
+                                $("#loading").fadeOut();
+
+                                window.location.href = srt// "/Home/createItem"
+                            }
+                            else {
+                                $("#loading").fadeOut();
+                                $("#loginModal").modal('toggle');
+                            }
+
+
+                        }
+                    })
+                }
+                $(".fa-save").click(function () {
+                    $("#loading").fadeIn();
+                    islogedIn("/Home/list?id=savedItem");
+                   
+                })
+                $(".fa-file").click(function () {
+                    $("#loading").fadeIn();
+
+                    islogedIn("/Home/createItem"); 
+                })
+                $(".fa-home").click(function () {
+                    $("#loading").fadeIn();
+
+                    window.location.href = "/Home/index"
+                })
+                $(".fa-user").click(function () {
+                    $("#loading").fadeIn();
+
+                    islogedIn("/Home/profile");
+                })
+                $(".fa-cog").click(function () {
+                    $("#loading").fadeIn();
+
+                    window.location.href = "/Home/setting"
+                })
+
+                var width = screen.width;
+                var number = "-" + width + "px";
+                $("#barmenu").css("margin-right", number);
+                
+                $(".fileterShow").click(function () {
+
+                    $("#barmenu").css("display", "block")
+                    $("#barmenu").animate({
+                        'margin-right': '0px'
+                    }, function () {
+                        $("#barmenu").css("background-color", "rgba(0, 0, 0, 0.2)")
+                    });
+                    $("#seachHolder").css("display", "none")
+                    $("#filterHolder").css("display", "block")
+                    $("body").css("overflow", "hidden");
+                })
+                $(".search").click(function () {
+
+                    $("#barmenu").css("display", "block")
+                    $("#barmenu").animate({
+                        'margin-right': '0px'
+                    }, function () {
+                        $("#barmenu").css("background-color", "rgba(0, 0, 0, 0.2)")
+                    });
+                    $("#seachHolder").css("display", "block")
+                    $("#filterHolder").css("display","none")
+                    $("body").css("overflow", "hidden");
+                })
+                $("#barmenu #barmanuholder").click(function (e) {
+                    e.stopPropagation();
+                });
+                $("#barmenu").click(function () {
+
+                    $("#barmenu").css("background-color", "rgba(0, 0, 0, 0)")
+                    $("#barmenu").animate({
+                        'margin-right': number
+                    }, function () {
+                        $("#barmenu").css("display", "none");
+                        $("#body").css("overflow", "scroll");
+
+                    });
+                    $("body").css("overflow", "scroll");
+                })
+            </script>
+
+        }
+        else
+        {
+
+            <div class="">
+                <style>
+                    /*فقط برای بخش فیلتر*/
+                    body {
+                        padding-top: 0
+                    }
+
+                    .siteheader {
+                        width: 100%;
+                        background-color: white;
+                        padding: 5px;
+                        display: flex;
+                        border-bottom: 1px solid #eee
+                    }
+
+                        .siteheader .menuHolder {
+                            display: flex;
+                            direction: rtl;
+                        }
+
+                            .siteheader .menuHolder p {
+                                padding: 10px 15px;
+                                margin: 0;
+                                font-weight: 600
+                            }
+
+                    .parent {
+                        display: flex;
+                    }
+
+                    #mainHolder {
+                        width: 75%;
+                        background-color: white;
+                        padding-top: 25px;
+                        direction: rtl
+                    }
+
+                    #filterParent {
+                        width: 25%;
+                        background-color: white;
+                        border-left: 0px solid #ddd;
+                        position: relative;
+                        padding-top: 25px
+                    }
+
+                    #filterHolder {
+                        width: 100%;
+                    }
+                </style>
+                <div class="siteheader">
+                    <div class="menuHolder">
+                        <p id="home">خانه</p>
+                       
+                        <p>تماس  با ما</p>
+                        <p>درباره ما</p>
+                        <p>مقاله</p>
+
+                        @{
+                            string srt = Session["token"] as string;
+                            if (@srt != null)
+                            {
+                                <p style="cursor:pointer;"  id="profileButt">پروفایل</p>
+                            }
+                            else
+                            {
+                                <p style="cursor:pointer;" id="loginButt">ورود</p>
+                            }
+
+
+                        }
+
+                        <p class="btn btn-danger" id="createItemButton" style="background-color:aqua; border-color:aqua; color:black"> ثبت آگهی رایگان</p>
+                        <script>
+                            function IsLogedIn(action) {
+                               
+                            }
+                            $("#createItemButton").click(function () {
+                                $.ajax({
+                                    url: '/Home/isLogedIn',
+                                    dataType: 'html',
+                                    success: function (data) {
+
+                                        if (data != "") {
+                                            window.location.href = "/Home/createItem" 
+                                        }
+                                        else {
+                                            $("#loginModal").modal('toggle');
+                                        }
+
+
+                                    }
+                                })
+                              
+                            })
+                            $("#loginButt").click(function () {
+                                $("#loginModal").modal('toggle');
+                            })
+                            $("#profileButt").click(function () {
+                                window.location.href = "/Home/profile"
+                            })
+                            
+                            $("#home").click(function () {
+                                window.location.href = "/Home/index";
+                            })
+                        </script>
+                    </div>
+                    <div class="logoholder"></div>
+                </div>
+                @RenderBody()
+            </div>
+        }
+    }
+
+
+
+
+
+
 </body>
 </html>

@@ -1,0 +1,144 @@
+﻿@model IEnumerable<string>
+<style>
+    .imageparent {
+        display: flex;
+        padding: 10px;
+        z-index:0;
+    }
+
+    .imageCover {
+        border-radius: 5px;
+        object-fit: scale-down;
+        align-items: center;
+        width: 90px;
+        height: 90px;
+        position: relative;
+        border: 1px solid #eee;
+        align-items: center;
+        display: flex;
+        cursor: pointer;
+        margin-left: 20px
+    }
+
+        .imageCover img {
+            max-width: 100%;
+            max-height : 100%;
+            margin:auto ;
+        }
+
+        .imageCover i {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+    .default {
+        max-width: 50% !important;
+        max-height:50% !important;
+    }
+</style>
+
+<div class="imageparent">
+    @{
+        foreach (var item in Model)
+        {
+            <div class="imageCover">
+
+                <img  src="@item" />
+               
+  
+            </div>
+        }
+    }
+          
+    <div class="imageCover">
+
+        <img class="default " src="~/images/addPic.png" />
+      
+    </div>
+</div>
+
+<input multiple type="file" id="imageFileHolder" name="image" required="required" class="form-control " style="display:none">
+
+<script>
+    $(".imageCover").click(function () {
+        $('#imageFileHolder').trigger('click');
+    })
+</script>
+
+<script language="javascript" type="text/javascript">
+
+                    $("#imageFileHolder").on('change', function () {
+                        $("#loading").fadeIn();
+                       // $("#dvPreview").html("");
+                        var input = this;
+                        if (input.files && input.files[0]) {
+                           
+
+                           
+                            var formData = new FormData();
+                            formData.append('blob', input.files[0]);
+                            formData.append('filename', 'add');
+                            formData.append('type', 'web');
+                            var MyAppUrlSettings = {
+                                MyUsefulUrl: '@Url.Action("GetImageForMCE", "Home")'
+                            };
+
+                            var request = new XMLHttpRequest();
+                            request.open('POST', MyAppUrlSettings.MyUsefulUrl);
+                            request.send(formData);
+
+                            request.upload.addEventListener("progress", progressHandler, false);
+                            request.addEventListener("load", completeHandler, false);
+                            request.addEventListener("error", errorHandler, false);
+                            request.addEventListener("abort", abortHandler, false);
+
+
+                            function _(el) {
+                                return document.getElementById(el);
+                            }
+
+
+
+                            function progressHandler(event) {
+                            
+                                console.log(event.loaded);
+                                $("#loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+                                var percent = (event.loaded / event.total) * 100;
+                                $("#progressBar").value = Math.round(percent);
+                                $("#status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+                            }
+
+
+
+                            function completeHandler(event) {
+                               // _("progressBar").value = 50;
+                                //alert("dgg");
+                                $('#imageHolder').html(request.responseText);
+                                $("#loading").fadeOut();
+                               //_("status").innerHTML = event.target.responseText;
+                               // _("progressBar").value = 0; //wil clear progress bar after successful upload
+                            }
+
+                            function errorHandler(event) {
+                                _("status").innerHTML = "Upload Failed";
+                            }
+
+                            function abortHandler(event) {
+                                _("status").innerHTML = "Upload Aborted";
+                            }
+
+                            request.onreadystatechange = function () {
+                                if (request.readyState == 4 && request.status == 200) {
+
+
+
+                                };
+                            };
+                        }
+                        else {
+                            alert("s")
+                        }
+
+                    });
+</script>

@@ -1,31 +1,766 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "لیست محصولات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+
+
+
+
+
+
+<script>
+    function getList() {
+        $.ajax({
+            url: '/Home/getItemList',
+            dataType: 'html',
+            success: function (data) {
+                if (data != "") {
+                    $("#mainHolder").append(data);
+                }
+             
+            }
+        })
+    }
+    getList();
+    $(window).scroll(function () {
+       // this.console.log($(window).scrollTop() + "-" + $(window).height() + "-" + $(document).height()+ "-" + (($(window).scrollTop() + $(window).height()) - ($(document).height() )) )
+        if ($(this).scrollTop() + $(this).innerHeight() >= $(document).height()) {
+           
+            $.ajax({
+                url: "/Home/changePage", 
+                dataType: "html",
+                success: function () {
+                    getList();
+                }
+            })
+        }
+    });
+</script>
+<div id="mapHolder" style="z-index:999; position:fixed;top:0; left:0; width:100%; height:100%;  background-color:white; display:none; text-align:center; background-color:white;  /* Negative half of width. */">
+
+    <div id="map" style="margin-top:5%; width: 100%; margin:auto; height: 90%; background: #eee; border: 2px solid #aaa;"></div>
+    <div id="closemap" class="btn btn-success" style="margin:auto; margin-top:10px">تایید موقعیت مکانی</div>
+    <i class=""></i>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+@{
+    int w = Request.Browser.ScreenPixelsWidth;
+    int h = Request.Browser.ScreenPixelsHeight;
+    if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
+    {
+        <div class="buttonHolder">
+            <div class="filter">
+                <div><i class="fal fa-location-arrow"></i></div>
+                <div>  <p style="margin:0">استان</p></div>
+                <div> <i style="float:left" class="fal fa-chevron-down"></i></div>
+            </div>
+            <div class="city">
+                <div style="width:20%"><i class="fal fa-home"></i></div>
+                <div style="flex:1;text-align:center">  <p style="margin:0">شهر/منطقه</p></div>
+                <div style="width:20%"> <i style="float:left" class="fal fa-chevron-down"></i></div>
+            </div>
+            <div class="province fileterShow ">
+                <div style="width:20%"><i class="fal fa-filter"></i></div>
+                <div style="flex:1;text-align:left">  <p style="margin:0">سایر فیلترها</p></div>
+            </div>
+        </div>
+        <div class="row" id="mainHolder" style="margin:0; padding-bottom:20px" >
+
+
+
+
+        </div>
+        <div class="addItem" style=""> ثبت آگهی &nbsp; <i class="fa fa-plus"></i></div>
+        <script>
+            $(".addItem").click(function () {
+                $("#loading").fadeIn();
+                $.ajax({
+                    url: '/Home/isLogedIn',
+                    dataType: 'html',
+                    success: function (data) {
+
+                        if (data != "") {
+                            $("#loading").fadeOut();
+                            window.location.href = "/Home/createItem"
+                        }
+                        else {
+                            $("#loading").fadeOut();
+                            $("#loginModal").modal('toggle');
+                        }
+
+
+                    }
+                })
+
+            })
+        </script>
+        <script>
+            $(document).ready(function () {
+                $(".fa-home").addClass("act")
+            })
+           
+        </script>
+    }
+    else
+    {
+        @section scripts{
+
+
+
+            <link href="~/Content/ProductListStyle.css" rel="stylesheet" />
+            <script>
+                var lastScrollTop = $(this).scrollTop();
+                function setFilterSection() {
+
+                    var st = $(this).scrollTop();
+                    var hT = $('#filterHolder').offset().top,
+                        hH = $('#filterHolder').outerHeight(),
+                        mainT = $('#mainHolder').offset().top,
+                        mainH = $('#mainHolder').outerHeight(),
+                        parentH = $('.parent').outerHeight(),
+                        wH = $(window).height(),
+                        docHeight = $(document).height(),
+                        wS = $(this).scrollTop();
+
+
+                    if (st > lastScrollTop) {
+
+                        if (hH > wH) {  // اگر ارتفا فیلتر بیشتر از صفحه باشد
+
+
+
+
+                            if (wS + wH > (hH) && wS + wH < mainT + mainH) {   //  اسکرول تاپ + ویندوز بزرگتر از  ارتفا فیلتر شود و کوچکتر از انتهای لیست
+                                $("#filterHolder").css("position", "fixed")
+                                $("#filterHolder").css("right", "0")
+                                $("#filterHolder").css("top", "0")
+                                $("#filterHolder").css("width", "25%")
+                            }
+                            else if (wS + wH > mainT + mainH) {  // اینجا رسیده به انتها و دیگه نباید پایین تر از لیست بره تو فوتر
+
+
+                                $("#filterHolder").css("width", "100%")
+                                $("#filterHolder").css("position", "absolute")
+                                $("#neshoone").text("1")
+
+
+
+                            }
+                        }
+                        else {
+                            if (wS > hT) {
+                                $("#filterHolder").css("position", "fixed")
+                                $("#filterHolder").css("right", "0")
+                                $("#filterHolder").css("top", "0")
+                                $("#filterHolder").css("width", "25%")
+                            }
+
+                        }
+                        // downscroll code
+
+
+                    } else {
+
+                        if (hH > wH) {  // اگر ارتفا فیلتر بیشتر از صفحه بود
+
+                            if ($("#neshoone").text() == "1") {
+                                console.log(wS);
+                                console.log(parentH);
+                                console.log(mainT + mainH - hH);
+
+                                if (wS < mainT + mainH - hH) {
+                                    $("#filterHolder").css("position", "fixed")
+                                    $("#filterHolder").css("right", "0")
+                                    $("#filterHolder").css("top", "0")
+                                    $("#filterHolder").css("bottom", "auto")
+                                    $("#filterHolder").css("width", "25%")
+
+                                    if (wS < mainT) {
+                                        $("#filterHolder").css("width", "100%")
+                                        $("#filterHolder").css("position", "relative")
+                                        $("#filterHolder").css("bottom", "auto")
+                                        $("#filterHolder").css("top", "auto")
+                                        $("#neshoone").text("0")
+                                    }
+                                }
+
+                            }
+                            else {
+                                if (wS + wH < (hH)) {
+
+                                    $("#filterHolder").css("width", "100%")
+                                    $("#filterHolder").css("position", "relative")
+                                    $("#filterHolder").css("bottom", "auto")
+
+
+                                }
+                            }
+
+                        } else {
+                            if ($("#neshoone").text() == "1") {
+
+
+                                if (wS < mainT + mainH - hH) {
+                                    $("#filterHolder").css("position", "fixed")
+                                    $("#filterHolder").css("right", "0")
+                                    $("#filterHolder").css("top", "0")
+                                    $("#filterHolder").css("bottom", "auto")
+                                    $("#filterHolder").css("width", "25%")
+
+                                    if (wS < mainT) {
+                                        $("#filterHolder").css("width", "100%")
+                                        $("#filterHolder").css("position", "relative")
+                                        $("#filterHolder").css("bottom", "auto")
+                                        $("#filterHolder").css("top", "auto")
+                                        $("#neshoone").text("0")
+                                    }
+                                }
+
+                            }
+                            else {
+                                if (wS < mainT) {
+
+                                    $("#filterHolder").css("width", "100%")
+                                    $("#filterHolder").css("position", "relative")
+                                    $("#filterHolder").css("bottom", "auto")
+
+
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+                    lastScrollTop = st;
+                }
+                $(window).scroll(function (event) {
+                    setFilterSection()
+                });
+            </script>
+
+            <link href="~/Content/persian-datepicker.css" rel="stylesheet" />
+            <script src="~/Scripts/persian-date.js"></script>
+            <script src="~/Scripts/persian-datepicker.js"></script>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $(".projectDate").pDatepicker();
+                });
+            </script>
+            <link href="~/Content/bootstrap-slider.css" rel="stylesheet" />
+            <script src="~/Scripts/bootstrap-slider.min.js"></script>
+
+            <script>
+                $("#lableToggle input").click(function () {
+                    $("#loading").css("display", "block");
+                    let value = "0";
+                    if ($(this).is(':checked')) {
+                        value = "1"
+                    }
+                    $.ajax({
+                        url: '/Home/changeAvailableStatus',
+                        data: {
+                            status: value,
+
+                        },
+                        dataType: 'html',
+                        success: function () {
+                            //location.reload();
+
+
+                        },
+                        error: function () {
+
+                        }
+                    });
+
+                })
+            </script>
+
+            <link rel="stylesheet" href="https://cdn.map.ir/web-sdk/1.4.2/css/mapp.min.css">
+            <link rel="stylesheet" href="https://cdn.map.ir/web-sdk/1.4.2/css/fa/style.css">
+
+            <link href="~/Content/jQuery-plugin-progressbar.css" rel="stylesheet" />
+            <script src="~/Scripts/jQuery-plugin-progressbar.js"></script>
+        }
+        <div class="parent">
+
+            <div id="neshoone" style="display:none"></div>
+            <div id="mainHolder" style=" padding:10px;">
+
+
+
+
+            </div>
+            <div id="filterParent">
+                <div id="filterHolder">
+
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#karbari" role="button" aria-expanded="false" aria-controls="karbari">نوع کاربری</div>
+                        <div class="collapse" id="karbari">
+                            <input id="karbariFinal" hidden/>
+                            <div class="panell" id="panel1">
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
+                                    <label class="containner CHcontainer">
+                                        تجاری
+                                        <input id="تجاری" type="checkbox" class="classd1">
+                                        <span class="checkmark"></span>
+                                    </label>
+
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
+                                    <label class="containner CHcontainer">
+                                        مسکونی
+                                        <input id="مسکونی" type="checkbox" class="classd1">
+                                        <span class="checkmark"></span>
+                                    </label>
+
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
+                                    <label class="containner CHcontainer">
+                                        اداری
+                                        <input  id="اداری"  type="checkbox" class="classd1">
+                                        <span class="checkmark"></span>
+                                    </label>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#tahvil" role="button" aria-expanded="false" aria-controls="tahvil">تاریخ تحویل</div>
+                        <div class="collapse" id="tahvil">
+                            <input type="text" class="form-control projectDate inputfield" />
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#merajserction" role="button" aria-expanded="false" aria-controls="tahvil">متراژ واحد</div>
+                        <div class="collapse" id="merajserction">
+                            <input id="metraj" type="text" class="form-control  inputfield" />
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#progressSection" role="button" aria-expanded="false" aria-controls="tahvil">درصد پیشرفت پروژه</div>
+                        <div class="collapse" id="progressSection">
+                            <input style="width:100%" id="ex6" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0" />
+                            <span style="width:100%" id="ex6CurrentSliderValLabel"> <span id="ex6SliderVal" style="padding:10px 20px;border:1px solid #ddd; margin-left:40%">3</span></span>
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#vahedmablagh" role="button" aria-expanded="false" aria-controls="vahedmablagh">مبلغ پرداختی</div>
+                        <div class="collapse" id="vahedmablagh">
+                            <input placeholder="مبلغ از" id="mablaghvarizFrom" type="text" class="form-control  inputfield" />
+                            <input placeholder="مبلغ تا" id="mablaghvarizFrom" type="text" class="form-control  inputfield" />
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#geshtmablagh" role="button" aria-expanded="false" aria-controls="geshtmablagh">مبلغ اقساط</div>
+                        <div class="collapse" id="geshtmablagh">
+                            <input placeholder="مبلغ از" id="mablaghGestFrom" type="text" class="form-control  inputfield" />
+                            <input placeholder="مبلغ تا" id="mablaghGestTo" type="text" class="form-control  inputfield" />
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#kollmablagh" role="button" aria-expanded="false" aria-controls="kollmablagh">مبلغ کل</div>
+                        <div class="collapse" id="kollmablagh">
+                            <input placeholder="مبلغ از" id="mablaghKollFrom" type="text" class="form-control  inputfield" />
+                            <input placeholder="مبلغ تا" id="mablaghKollFrom" type="text" class="form-control  inputfield" />
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+
+                        <div class="accordion" data-toggle="collapse" href="#mahdoode" role="button" aria-expanded="false" aria-controls="kollmablagh">انتخاب موقعیت</div>
+                        <div class="collapse" id="mahdoode">
+                            <div style="display:flex">
+                                <div style="margin:auto; background-color:aqua; border-color:red;border-color:aqua; color:#8d8d8d; margin-bottom:15px;" id="showMap" class="btn btn-success;">انتخاب</div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="accholder" style="padding:10px">
+                        <div class="row" style="margin:0px; padding:0px 40px">
+                            <label id="lableToggle" style="display:inline-block" class="switch">
+                                <input type="checkbox">
+                                <span class="sliderr round"></span>
+                            </label>
+                            <p id="availableTiggle">فقط موارد موجود</p>
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div class="accholder" style="padding:10px">
+                        <div class="row" style="margin:0px; padding:5px; text-align:center">
+
+                            <p id="reloadList" class="btn btn-success" style="width:100%; border-color:aqua; color:black; background-color:aqua">تایید</p>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    }
+}
+
+
+
+<script type="text/javascript" src="https://cdn.map.ir/web-sdk/1.4.2/js/mapp.env.js"></script>
+<script type="text/javascript" src="https://cdn.map.ir/web-sdk/1.4.2/js/mapp.min.js"></script>
+<script src="~/Scripts/Map.SelectArea.min.js"></script>
+<script type="text/javascript">
+    var loclist = [];
+    function showLocation(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+
+        var myMap = new L.Map('map', {
+            minZoom: 1,
+            maxZoom: 20,
+            center: [lat, lon],
+            zoom: 15
+        });
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        L.TileLayer.wmsHeader(
+            "https://map.ir/shiveh",
+            {
+                layers: "Shiveh:Shiveh",
+                format: "image/png",
+                minZoom: 1,
+                maxZoom: 20
+            },
+            [
+                {
+                    header: "x-api-key",
+                    value: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjdjZTBhMDNiYmZiOWI3MWYxZTYwYzFiNjg2MTdkMTljZTA2Y2U4MjEzMzRlNjRkZjllNDZiYTUwMmE5NmI2YjgxMDFmYmE1Zjk1MTNjOGUzIn0.eyJhdWQiOiI4NjY0IiwianRpIjoiN2NlMGEwM2JiZmI5YjcxZjFlNjBjMWI2ODYxN2QxOWNlMDZjZTgyMTMzNGU2NGRmOWU0NmJhNTAyYTk2YjZiODEwMWZiYTVmOTUxM2M4ZTMiLCJpYXQiOjE1ODY1OTQ4MDEsIm5iZiI6MTU4NjU5NDgwMSwiZXhwIjoxNTg5MTg2ODAxLCJzdWIiOiIiLCJzY29wZXMiOlsiYmFzaWMiXX0.dCY2mtjog8J2xVXPS2FhqnGgoqrYq5mYAjqK3XxWrDDIQsv8p9lbF9ZHlSidZi3DN7EkhY6Py3E7yBJiZ_iBWhAyrJ6qpjgjEm8Eu-I0m2h1UVkrJqObtWzkaBRyl_WRxWP7hAcbSve-g5OIrWoCSkyeW_R8NqyfPD-4xMrBl3g78klaQlZbxU19rNU2OcFj8IRCMeepwiQNgKEViOuStQOqnJqBc7ofzPzr8okUBX_alwDFVx4IFXuLUAPksxqCzdwiPyfS0F1FsdoW_2T_oYIBjvzbKdcLYEAygwFZpniUIE5f3eo_pxMtWdpa40NolTx9qlBtm3FDIdDoDvIgTw"
+                }
+            ]
+        ).addTo(myMap);
+
+
+
+
+
+        var finallist = [];
+        var polyline;
+        myMap.on('click', function (e) {
+
+            lat = e.latlng.lat;
+            lon = e.latlng.lng;
+
+            console.log("You clicked the map at LAT: " + lat + " and LONG: " + lon);
+            //Clear existing marker,
+
+
+
+            //Add a marker to show where you clicked.
+            theMarker = L.marker([lat, lon], { icon: greenIcon }).addTo(myMap);
+            finallist = [];
+            loclist.push([lat, lon]);
+
+            for (var i = 0; i < loclist.length; i++) {
+                finallist.push(loclist[i]);
+
+                //Do something
+            }
+            finallist.push(loclist[0]);
+
+
+            if (polyline != undefined) {
+                myMap.removeLayer(polyline);
+            };
+            polyline = L.polyline(finallist).addTo(myMap);
+        });
+        // theMarker = L.marker([lat, lon], { icon: greenIcon }).addTo(myMap);
+        $("#lat").val(lat);
+        $("#lon").val(lon);
+
+
+
+
+
+
+    }
+    function errorHandler(err) {
+
+        if (err.code == 1) {
+            // alert("Error: Access is denied!");
+        } else if (err.code == 2) {
+            // alert("Error: Position is unavailable!");
+        }
+
+
+
+        var myMap = new L.Map('map', {
+            minZoom: 1,
+            maxZoom: 20,
+
+            center: [35.78814580766617, 51.48377474806597],
+            zoom: 15
+        });
+        myMap.selectArea.enable();
+
+        myMap.on('areaselected', (e) => {
+            console.log(e.bounds.toBBoxString()); // lon, lat, lon, lat
+        });
+
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        L.TileLayer.wmsHeader(
+            "https://map.ir/shiveh",
+            {
+                layers: "Shiveh:Shiveh",
+                format: "image/png",
+                minZoom: 1,
+                maxZoom: 20
+            },
+            [
+                {
+                    header: "x-api-key",
+                    value: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjdjZTBhMDNiYmZiOWI3MWYxZTYwYzFiNjg2MTdkMTljZTA2Y2U4MjEzMzRlNjRkZjllNDZiYTUwMmE5NmI2YjgxMDFmYmE1Zjk1MTNjOGUzIn0.eyJhdWQiOiI4NjY0IiwianRpIjoiN2NlMGEwM2JiZmI5YjcxZjFlNjBjMWI2ODYxN2QxOWNlMDZjZTgyMTMzNGU2NGRmOWU0NmJhNTAyYTk2YjZiODEwMWZiYTVmOTUxM2M4ZTMiLCJpYXQiOjE1ODY1OTQ4MDEsIm5iZiI6MTU4NjU5NDgwMSwiZXhwIjoxNTg5MTg2ODAxLCJzdWIiOiIiLCJzY29wZXMiOlsiYmFzaWMiXX0.dCY2mtjog8J2xVXPS2FhqnGgoqrYq5mYAjqK3XxWrDDIQsv8p9lbF9ZHlSidZi3DN7EkhY6Py3E7yBJiZ_iBWhAyrJ6qpjgjEm8Eu-I0m2h1UVkrJqObtWzkaBRyl_WRxWP7hAcbSve-g5OIrWoCSkyeW_R8NqyfPD-4xMrBl3g78klaQlZbxU19rNU2OcFj8IRCMeepwiQNgKEViOuStQOqnJqBc7ofzPzr8okUBX_alwDFVx4IFXuLUAPksxqCzdwiPyfS0F1FsdoW_2T_oYIBjvzbKdcLYEAygwFZpniUIE5f3eo_pxMtWdpa40NolTx9qlBtm3FDIdDoDvIgTw"
+                }
+            ]
+        ).addTo(myMap);
+
+
+
+
+        var theMarker = {};
+
+        var finallist = [];
+        var polyline;
+        myMap.on('click', function (e) {
+
+            lat = e.latlng.lat;
+            lon = e.latlng.lng;
+
+
+            console.log("You clicked the map at LAT: " + lat + " and LONG: " + lon);
+            //Clear existing marker,
+
+            //if (theMarker != undefined) {
+            //    myMap.removeLayer(theMarker);
+            //};
+
+            //Add a marker to show where you clicked.
+            theMarker = L.marker([lat, lon], { icon: greenIcon }).addTo(myMap);
+            finallist = [];
+            loclist.push([lat, lon]);
+
+            for (var i = 0; i < loclist.length; i++) {
+                finallist.push(loclist[i]);
+
+                //Do something
+            }
+            finallist.push(loclist[0]);
+
+
+            if (polyline != undefined) {
+                myMap.removeLayer(polyline);
+            };
+            polyline = L.polyline(finallist).addTo(myMap);
+
+        });
+
+
+    }
+    function getLocation() {
+        if (navigator.geolocation) {
+            // timeout at 60000 milliseconds (60 seconds)
+            var options = { timeout: 60000 };
+            navigator.geolocation.getCurrentPosition
+                (showLocation, errorHandler, options);
+        } else {
+            alert("Sorry, browser does not support geolocation!");
+        }
+    }
+
+
+    $("#closemap").click(function () {
+
+
+
+        $("body").css("overflow", "scroll");
+        //$("#showMap").text("انتخاب شده ")
+        //$("#showMap").css("background-color", "#4cae4c")
+        //$("#showMap").css("border-color", "#4cae4c")
+
+        $.ajax({
+            url: "/Home/setPolygon",
+            data: {
+                srt: loclist.toString()
+            },
+            success: function (data) {
+                var x = document.getElementById("mapHolder");
+                x.style.display = "none";
+
+                window.location.href = "/Home/Index"
+            }
+
+        })
+
+
+    })
+    $("#showMap").click(function () {
+        var x = document.getElementById("mapHolder");
+        x.style.display = "block";
+        $("body").css("overflow", "hidden")
+        getLocation()
+
+        //if (x.style.display === "none") {
+        //    x.style.display = "block";
+        //} else {
+        //    x.style.display = "none";
+        //}
+        ////$("#mapHolder").css("width", "100%");
+        ////$("#mapHolder").css("height", "450px");
+        ////$("body").css("overflow", "hidden")
+        ////$(".main_container").css("display", "none");
+    })
+
+
+
+
+</script>
+<script>
+    $("#ex6").slider();
+    $("#ex6").on("slide", function (slideEvt) {
+        $("#ex6SliderVal").text(slideEvt.value);
+    });
+</script>
+<script>
+    $(".classd1").click(function () {
+        if ($(this).prop("checked") == true) {
+            var srt = $("#karbariFinal").val() + $(this).attr('id')+",";
+            $("#karbariFinal").val(srt);
+            $.ajax({
+                url: '/Home/setType',
+                dataType: 'html',
+                data: {
+                    srt: srt,
+                }
+            
+            })
+            
+        } else {
+            var srt = $("#karbariFinal").val().replace($(this).attr('id')+",",'') ;
+            $.ajax({
+                url: '/Home/setType',
+                dataType: 'html',
+                data: {
+                    srt: srt,
+                }
+
+            })
+        }
+    })
+    $("#reloadList").click(function () {
+        $("#loadin").fadeIn();
+        $.ajax({
+            url: '/Home/getItemList',
+            dataType: 'html',
+            data: {
+                page :"0",
+            },
+            success: function (data) {
+               
+                if (data != "") {
+                    $("#loadin").fadeOut();
+                    $("#mainHolder").html(data);
+                }
+
+            }
+        })
+    })
+</script>
