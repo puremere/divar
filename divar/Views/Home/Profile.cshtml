@@ -71,8 +71,13 @@
             <div class="header">
                 خانه دان
             </div>
-            <div class="content">شما با شماره موبایل 09194594505 وارد شده اید و آگهی های مربوط به این شماره را مشاهده میکنید</div>
-            <div class="button" style=" ">خروج از حساب </div>
+            @{
+                string phone = TempData["phone"] as string ;
+                TempData.Keep();
+                <div class="content">شما با شماره موبایل @phone وارد شده اید و آگهی های مربوط به این شماره را مشاهده میکنید</div>
+
+            }
+            <div id="logout" class="button" style=" ">خروج از حساب </div>
             <div class="devider"></div>
             <div id="mydivar" class="buttHolder">
 
@@ -201,12 +206,26 @@
             })
                            // getSaved();
 
+
+
+          
         </script>
+
 
     }
 }
 
 
-
+<script>
+    $("#logout").click(function () {
+        $("#loading").fadeIn();
+        $.ajax({
+            url: "/Home/Logout",
+            success: function () {
+                window.location.href = "/Home/index";
+            }
+        })
+    })
+</script>
 
 

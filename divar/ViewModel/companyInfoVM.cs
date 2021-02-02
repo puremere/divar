@@ -3,30 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace divar.ViewModel.itemList
+namespace divar.ViewModel.companyInfo
 {
-   
-    public class Listad
+    
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+    public class Company
     {
         public string ID { get; set; }
         public string title { get; set; }
-        public string desc_ads { get; set; }
-        public string total_amount { get; set; }
-        public string address { get; set; }
-        public string companyname { get; set; }
-        public string account_type { get; set; }
-        public string end_date { get; set; }
-        public string project_process_percentage { get; set; }
-        public string time { get; set; }
-        public string saved { get; set; }
+        public string phone { get; set; }
         public string image { get; set; }
+        public string desc_company { get; set; }
     }
 
     public class Data
     {
-        public int count { get; set; }
-        public List<Listad> listads { get; set; }
-        public string hasnextpage { get; set; }
+        public Company company { get; set; }
     }
 
     public class Response
@@ -40,9 +32,12 @@ namespace divar.ViewModel.itemList
         public bool can_dismiss { get; set; }
     }
 
-    public class itemListVM
+    public class companyInfoVM
+   
     {
         public Data data { get; set; }
         public Response response { get; set; }
     }
+
+
 }

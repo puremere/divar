@@ -8,8 +8,28 @@
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
 
+
+    @RenderSection("scripts", required: false)
+    <script>
+        function getList() {
+
+            $("#loading").show();
+            $.ajax({
+
+                url: '/Home/getItemList',
+                dataType: 'html',
+                success: function (data) {
+                    if (data != "") {
+                       
+                        $("#mainHolder").append(data);
+                        $("#loading").hide();
+                    }
+
+                }
+            })
+        }
+    </script>
 
 
     @{
@@ -64,13 +84,19 @@
 
             <link href="~/Content/jQuery-plugin-progressbar.css" rel="stylesheet" />
             <script src="~/Scripts/jQuery-plugin-progressbar.js"></script>
+
+            <link href="~/Content/toastr.css" rel="stylesheet" />
+            <script src="~/Scripts/toastr.js"></script>
+
+
         }
     }
 
-    
+
     <link href="~/Content/Site.css" rel="stylesheet" />
     <link href="~/Content/fontawesome-all.css" rel="stylesheet" />
     <link href="~/Content/bootstrap.css" rel="stylesheet" />
+
     <style>
         body {
             background-color: white !important;
@@ -126,18 +152,18 @@
 
         .imageHolder {
             object-fit: fill;
-            width:50%;
+            width: 50%;
             height: 150px;
             display: flex;
             align-items: center;
-            padding:5px;
-            object-fit:cover
+            padding: 5px;
+            object-fit: cover
         }
 
             .imageHolder img {
                 height: 100%;
                 width: 100%;
-                margin:auto;
+                margin: auto;
             }
 
         .contetnHolder {
@@ -329,10 +355,10 @@
                     <div class="inputsection ">
                         <div class="pish level1">+98</div>
                         <div class="inputHolder">
-                            <input id="phoneInput" class="form-control level1" style="border-radius:0" placeholder="" />
+                            <input maxlength="10"  id="phoneInput" class="form-control level1" style="border-radius:0" placeholder="" />
                         </div>
                         <div class="inputHolder">
-                            <input id="codeInput" class="form-control level2" style="border-radius:0" placeholder="کد تایید 6 رقمی" />
+                            <input maxlength="6"  id="codeInput" class="form-control level2" style="border-radius:0" placeholder="کد تایید 6 رقمی" />
                         </div>
 
 
@@ -358,6 +384,10 @@
             $(".codeButt").click(function () {
                 phone = $("#phoneInput").val();
                 // برو کدو بفرست تو برگشت این کارارو کن
+                if (phone.length < 10) {
+                   
+                    return;
+                } 
                 $("#loading").fadeIn();
                 $.ajax({
                     url: '/Home/getCode',
@@ -367,10 +397,22 @@
                         code: ''
                     },
                     success: function (data) {
+                      
+                        if (data.length > 0 ) {
+                            alert(data);
+                            $("#loading").fadeOut();
+                        }
+                        else {
+                            $("#loading").fadeOut();
+                            $("#phoneHolder").text(phone);
+                            $(".level1").css("display", "none");
+                            $(".level2").css("display", "inline-block");
+                        }
+                       
+                    },
+                    error: function () {
+                        alert("خطا مجددا تلاش کنید");
                         $("#loading").fadeOut();
-                        $("#phoneHolder").text(phone);
-                        $(".level1").css("display", "none");
-                        $(".level2").css("display", "inline-block");
                     }
                 })
 
@@ -394,14 +436,14 @@
                     success: function (data) {
                         if (data != "") {
                             $("#loading").fadeOut();
-                           // $("#loginModal").modal('toggle');
+                            // $("#loginModal").modal('toggle');
                             location.reload();
                         }
                         else {
                             $("#loading").fadeOut();
                             alert(data);
                         }
-                       
+
                     }
                 })
             })
@@ -535,10 +577,11 @@
             <div id="barmenu" style="display:none; height: 100%; width : 100% ;display:none; position: fixed;top: 0;z-index: 9;background-color:rgba(0, 0, 0, 0);right: 0;">
                 <div id="barmanuholder" style="position:relative; overflow-y:scroll; width:90% ; background-color:white; float:right; height:100%; ">
 
-                    
+
                     <div id="filterParent">
+
                         <div id="seachHolder" style="width: 80%;margin: auto;margin-top: 20px;">
-                            <input style="text-align:right" class="form-control" placeholder="عبارت مورد نظر خود را بنویسید" />
+                            <input id="query" style="text-align:right" class="form-control" placeholder="عبارت مورد نظر خود را بنویسید" />
                         </div>
                         <div id="filterHolder">
 
@@ -709,10 +752,10 @@
 
                         </div>
 
-                        <div class="accholder" style="padding:10px">
+                        <div class="accholder" style="padding:10px; width:85%; margin:10px auto">
                             <div class="row" style="margin:0px; padding:5px; text-align:center">
 
-                                <p id="reloadList" class="btn btn-success" style="width:100%; border-color:aqua; color:black; background-color:aqua">تایید</p>
+                                <p id="searchQuery" class="btn btn-success" style="width:100%;border-color:aqua;color:black;background-color:aqua;padding: 10px;font-size: 14px;">جستجو</p>
                             </div>
 
 
@@ -731,13 +774,106 @@
                                     $(this).siblings().addClass("collapse")
                                 }
                             })
+                            $("#searchQuery").click(function () {
+                                if ($("#query").val().length > 0) {
+                                    $.ajax({
+                                        url: "/home/changeQuery",
+                                        data: {
+                                            query : $("#query").val(),
+                                        },
+                                        success: function () {
+                                            $("#barmenu").click();
+                                            $("#mainHolder").html('');
+                                            getList();
+                                        }
+                                    })
+                                }
+                            })
+
+                        </script>
+
+                    </div>
+
+                    <div id="khabaramkon" style="display:none">
+
+                        <div id="" style="width: 80%;margin: auto;margin-top: 20px;">
+                            <input id="kphone" style="text-align:right" class="form-control" placeholder="شماره همراه" />
+                        </div>
+                        <div id="" style="width: 80%;margin: auto;margin-top: 20px;">
+                            <input id="kProjectName" style="text-align:right" class="form-control" placeholder="نام پروژه" />
+                        </div>
+                        <div id="" style="width: 80%;margin: auto;margin-top: 20px;">
+                            <input id="kCompanyName" style="text-align:right" class="form-control" placeholder="نام شرکت سازنده" />
+                        </div>
+                        <div class="accholder" style="width: 82%;margin: 20px auto;">
+                            <div class="row" style="margin:0px; padding:5px; text-align:center">
+
+                                <p id="khabarButt" class="btn btn-success" style="width:100%;border-color:aqua;color:black;background-color:aqua;padding: 10px;font-size: 14px;">خبرم کن</p>
+                            </div>
+                        </div>
+
+                        <script>
+                            $("#khabarButt").click(function () {
+                              
+                                $.ajax({
+                                    url: '/Home/isLogedIn',
+                                    dataType: 'html',
+                                    success: function (data) {
+
+                                        if (data != "") {
+                                            $("#loading").fadeOut();
+                                            let phone = $("#kphone").val();
+                                            let kCompanyName = $("#kCompanyName").val();
+                                            let kProjectName = $("#kProjectName").val();
+
+                                            $.ajax({
+                                                url: "/Home/KhabaramKon",
+                                                dataType: 'html',
+                                                data: {
+                                                    phone: phone,
+                                                    kCompanyName: kCompanyName,
+                                                    kProjectName: kProjectName
+                                                },
+                                                success: function(){
+                                                    alert("انجام شد");
+                                                    $("#barmenu").click();
+                                                    $("#kphone").val('');
+                                                    $("#kCompanyName").val('');
+                                                    $("#kProjectName").val('');
+                                                },
+
+
+                                            });
+                                        }
+                                        else {
+                                            //toastr.options = {
+                                            //    "debug": false,
+                                            //    "positionClass": "toast-top-center",
+                                            //    "onclick": null,
+                                            //    "fadeIn": 300,
+                                            //    "fadeOut": 1000,
+                                            //    "timeOut": 5000,
+                                            //    "extendedTimeOut": 1000
+                                            //}
+                                            //toastr.error('لطفاً تمامی موارد را کامل کنید')
+                                            $("#loading").fadeOut();
+                                            $("#loginModal").modal('toggle');
+                                        }
+
+
+                                    }
+                                })
+                               
+
+                            })
                         </script>
                     </div>
                 </div>
 
             </div>
-            <div style="margin-bottom:70px">
+            <div style="margin-bottom:70px;font-size: 14px;font-weight: 600;">
                 @RenderBody()
+
             </div>
             <style>
                 .appfooter {
@@ -747,19 +883,21 @@
                     display: flex;
                     align-items: center;
                     padding: 10px;
-                    background-color:white;
+                    background-color: white;
                 }
+
                     .appfooter i {
                         height: 100%;
-                        font-size:18px
+                        font-size: 18px
                     }
+
                         .appfooter i.act {
                             color: #82DEED;
-                            
                         }
+
                 .imgH {
-                    width:20%;
-                    text-align:center;
+                    width: 20%;
+                    text-align: center;
                 }
             </style>
             <div class="appfooter ">
@@ -772,7 +910,7 @@
 
 
             </div>
-            
+
             <script>
                 function islogedIn(srt) {
                     $.ajax({
@@ -797,12 +935,12 @@
                 $(".fa-save").click(function () {
                     $("#loading").fadeIn();
                     islogedIn("/Home/list?id=savedItem");
-                   
+
                 })
                 $(".fa-file").click(function () {
                     $("#loading").fadeIn();
 
-                    islogedIn("/Home/createItem"); 
+                    islogedIn("/Home/createItem");
                 })
                 $(".fa-home").click(function () {
                     $("#loading").fadeIn();
@@ -823,8 +961,28 @@
                 var width = screen.width;
                 var number = "-" + width + "px";
                 $("#barmenu").css("margin-right", number);
-                
+
+                $(".fa-bell").click(function () {
+                   
+
+                    $("#filterParent").css("display", "none");
+                    $("#khabaramkon").css("display", "block");
+
+
+                    $("#barmenu").css("display", "block")
+                    $("#barmenu").animate({
+                        'margin-right': '0px'
+                    }, function () {
+                        $("#barmenu").css("background-color", "rgba(0, 0, 0, 0.2)")
+                    });
+                    $("body").css("overflow", "hidden");
+
+                });
+
                 $(".fileterShow").click(function () {
+
+                    $("#filterParent").css("display", "block");
+                    $("#khabaramkon").css("display", "none");
 
                     $("#barmenu").css("display", "block")
                     $("#barmenu").animate({
@@ -838,6 +996,10 @@
                 })
                 $(".search").click(function () {
 
+
+                    $("#filterParent").css("display", "block");
+                    $("#khabaramkon").css("display", "none");
+
                     $("#barmenu").css("display", "block")
                     $("#barmenu").animate({
                         'margin-right': '0px'
@@ -845,7 +1007,7 @@
                         $("#barmenu").css("background-color", "rgba(0, 0, 0, 0.2)")
                     });
                     $("#seachHolder").css("display", "block")
-                    $("#filterHolder").css("display","none")
+                    $("#filterHolder").css("display", "none")
                     $("body").css("overflow", "hidden");
                 })
                 $("#barmenu #barmanuholder").click(function (e) {
@@ -862,6 +1024,9 @@
 
                     });
                     $("body").css("overflow", "scroll");
+                })
+                $(".logo").click(function () {
+                    window.location.href = "/Home/index"
                 })
             </script>
 
@@ -921,7 +1086,7 @@
                 <div class="siteheader">
                     <div class="menuHolder">
                         <p id="home">خانه</p>
-                       
+
                         <p>تماس  با ما</p>
                         <p>درباره ما</p>
                         <p>مقاله</p>
@@ -930,7 +1095,7 @@
                             string srt = Session["token"] as string;
                             if (@srt != null)
                             {
-                                <p style="cursor:pointer;"  id="profileButt">پروفایل</p>
+                                <p style="cursor:pointer;" id="profileButt">پروفایل</p>
                             }
                             else
                             {
@@ -943,7 +1108,7 @@
                         <p class="btn btn-danger" id="createItemButton" style="background-color:aqua; border-color:aqua; color:black"> ثبت آگهی رایگان</p>
                         <script>
                             function IsLogedIn(action) {
-                               
+
                             }
                             $("#createItemButton").click(function () {
                                 $.ajax({
@@ -952,7 +1117,7 @@
                                     success: function (data) {
 
                                         if (data != "") {
-                                            window.location.href = "/Home/createItem" 
+                                            window.location.href = "/Home/createItem"
                                         }
                                         else {
                                             $("#loginModal").modal('toggle');
@@ -961,7 +1126,7 @@
 
                                     }
                                 })
-                              
+
                             })
                             $("#loginButt").click(function () {
                                 $("#loginModal").modal('toggle');
@@ -969,7 +1134,7 @@
                             $("#profileButt").click(function () {
                                 window.location.href = "/Home/profile"
                             })
-                            
+
                             $("#home").click(function () {
                                 window.location.href = "/Home/index";
                             })
@@ -978,6 +1143,7 @@
                     <div class="logoholder"></div>
                 </div>
                 @RenderBody()
+
             </div>
         }
     }
@@ -986,6 +1152,12 @@
 
 
 
-
+    <div class="lastline" style="display:none; height:2px"></div>
+   
+    <script>
+        $("#phoneInput").on("input", function () {
+            if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');
+        })
+    </script>
 </body>
 </html>

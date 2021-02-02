@@ -8,47 +8,70 @@
 
 
 
-
 <script>
-    function getList() {
-        $.ajax({
-            url: '/Home/getItemList',
-            dataType: 'html',
-            success: function (data) {
-                if (data != "") {
-                    $("#mainHolder").append(data);
-                }
-             
-            }
-        })
-    }
+   
     getList();
+    let lastpose = 0;
     $(window).scroll(function () {
-       // this.console.log($(window).scrollTop() + "-" + $(window).height() + "-" + $(document).height()+ "-" + (($(window).scrollTop() + $(window).height()) - ($(document).height() )) )
-        if ($(this).scrollTop() + $(this).innerHeight() >= $(document).height()) {
+        //alert(($(this).scrollTop() + $(this).innerHeight());
+        //alert($(document).height())
+        // this.console.log($(window).scrollTop() + "-" + $(window).height() + "-" + $(document).height()+ "-" + (($(window).scrollTop() + $(window).height()) - ($(document).height() )) )
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
            
-            $.ajax({
-                url: "/Home/changePage", 
-                dataType: "html",
-                success: function () {
-                    getList();
+         
+            if ((window.innerHeight + window.scrollY) - lastpose > 100) {
+                lastpose = window.innerHeight + window.scrollY
+                let bool = $("#changePage").text();
+            
+                if (bool.includes("rue")) {
+                    $.ajax({
+                        url: "/Home/changePage",
+                        dataType: "html",
+                        success: function (data) {
+                            getList();
+                            
+
+                           
+                        }
+                    })
                 }
-            })
+            }
+
+              
         }
     });
 </script>
+
 <div id="mapHolder" style="z-index:999; position:fixed;top:0; left:0; width:100%; height:100%;  background-color:white; display:none; text-align:center; background-color:white;  /* Negative half of width. */">
 
     <div id="map" style="margin-top:5%; width: 100%; margin:auto; height: 90%; background: #eee; border: 2px solid #aaa;"></div>
     <div id="closemap" class="btn btn-success" style="margin:auto; margin-top:10px">تایید موقعیت مکانی</div>
     <i class=""></i>
 </div>
+<link href="~/Content/easy-autocomplete.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.easy-autocomplete.min.js"></script>
 
 @{
+
     int w = Request.Browser.ScreenPixelsWidth;
     int h = Request.Browser.ScreenPixelsHeight;
     if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
     {
+        <div style="width:100%; top: 50%; left: 50%;transform: translate(-50%, -50%);" class="modal fade" id="citymodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+
+                    <div class="modal-body">
+                        <input id="" class="form-control state" style="direction:rtl; display:none" />
+                        <input id="" class="form-control cityinput" style="direction:rtl;display:none" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">تایید</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="buttonHolder">
             <div class="filter">
                 <div><i class="fal fa-location-arrow"></i></div>
@@ -65,7 +88,8 @@
                 <div style="flex:1;text-align:left">  <p style="margin:0">سایر فیلترها</p></div>
             </div>
         </div>
-        <div class="row" id="mainHolder" style="margin:0; padding-bottom:20px" >
+
+        <div class="row" id="mainHolder" style="margin:0; padding-bottom:20px">
 
 
 
@@ -99,7 +123,20 @@
             $(document).ready(function () {
                 $(".fa-home").addClass("act")
             })
-           
+
+        </script>
+        <script>
+            $(".filter").click(function () {
+                $(".cityinput").hide();
+                $(".state").show();
+                $("#citymodal").modal('toggle');
+
+            });
+            $(".city").click(function () {
+                $(".cityinput").show();
+                $(".state").hide();
+                $("#citymodal").modal('toggle');
+            })
         </script>
     }
     else
@@ -246,7 +283,9 @@
             <script src="~/Scripts/persian-datepicker.js"></script>
             <script type="text/javascript">
                 $(document).ready(function () {
-                    $(".projectDate").pDatepicker();
+                    $(".projectDate").pDatepicker({
+                        format: 'YYYY/MM/DD',
+                    });
                 });
             </script>
             <link href="~/Content/bootstrap-slider.css" rel="stylesheet" />
@@ -302,7 +341,7 @@
 
                         <div class="accordion" data-toggle="collapse" href="#karbari" role="button" aria-expanded="false" aria-controls="karbari">نوع کاربری</div>
                         <div class="collapse" id="karbari">
-                            <input id="karbariFinal" hidden/>
+                           
                             <div class="panell" id="panel1">
 
                                 <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
@@ -324,7 +363,7 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 checkboxFilter">
                                     <label class="containner CHcontainer">
                                         اداری
-                                        <input  id="اداری"  type="checkbox" class="classd1">
+                                        <input id="اداری" type="checkbox" class="classd1">
                                         <span class="checkmark"></span>
                                     </label>
 
@@ -338,6 +377,23 @@
 
 
 
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+
+                        <div class="accordion" data-toggle="collapse" href="#ostan" role="button" aria-expanded="false" aria-controls="tahvil">استان</div>
+                        <div class="collapse" id="ostan" style="padding:10px;">
+                            <input id="" class="form-control state" style="direction:rtl" />
+
+                        </div>
+
+                    </div>
+                    <div class="accholder filterholder" id="filter1">
+                        <div class="accordion" data-toggle="collapse" href="#shahr" role="button" aria-expanded="false" aria-controls="tahvil">شهر</div>
+                        <div class="collapse" id="shahr" style="padding:10px;">
+                            <input id="" class="form-control cityinput" style="direction:rtl" />
+
+                        </div>
 
                     </div>
                     <div class="accholder filterholder" id="filter1">
@@ -360,7 +416,8 @@
 
                         <div class="accordion" data-toggle="collapse" href="#merajserction" role="button" aria-expanded="false" aria-controls="tahvil">متراژ واحد</div>
                         <div class="collapse" id="merajserction">
-                            <input id="metraj" type="text" class="form-control  inputfield" />
+                            <input placeholder="متراژ از" id="metrajfrom" type="text" class="form-control  inputfield" />
+                            <input placeholder="متراژ تا" id="metrajTo" type="text" class="form-control  inputfield" />
                         </div>
 
 
@@ -376,7 +433,7 @@
                         <div class="accordion" data-toggle="collapse" href="#progressSection" role="button" aria-expanded="false" aria-controls="tahvil">درصد پیشرفت پروژه</div>
                         <div class="collapse" id="progressSection">
                             <input style="width:100%" id="ex6" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0" />
-                            <span style="width:100%" id="ex6CurrentSliderValLabel"> <span id="ex6SliderVal" style="padding:10px 20px;border:1px solid #ddd; margin-left:40%">3</span></span>
+                            <span style="width:100%" id="ex6CurrentSliderValLabel"> <span id="ex6SliderVal" style="padding:10px 20px;border:1px solid #ddd; margin-left:40%">0</span></span>
                         </div>
 
 
@@ -392,7 +449,7 @@
                         <div class="accordion" data-toggle="collapse" href="#vahedmablagh" role="button" aria-expanded="false" aria-controls="vahedmablagh">مبلغ پرداختی</div>
                         <div class="collapse" id="vahedmablagh">
                             <input placeholder="مبلغ از" id="mablaghvarizFrom" type="text" class="form-control  inputfield" />
-                            <input placeholder="مبلغ تا" id="mablaghvarizFrom" type="text" class="form-control  inputfield" />
+                            <input placeholder="مبلغ تا" id="mablaghvarizTo" type="text" class="form-control  inputfield" />
                         </div>
 
 
@@ -424,7 +481,7 @@
                         <div class="accordion" data-toggle="collapse" href="#kollmablagh" role="button" aria-expanded="false" aria-controls="kollmablagh">مبلغ کل</div>
                         <div class="collapse" id="kollmablagh">
                             <input placeholder="مبلغ از" id="mablaghKollFrom" type="text" class="form-control  inputfield" />
-                            <input placeholder="مبلغ تا" id="mablaghKollFrom" type="text" class="form-control  inputfield" />
+                            <input placeholder="مبلغ تا" id="mablaghKollTo" type="text" class="form-control  inputfield" />
                         </div>
 
 
@@ -721,46 +778,169 @@
 </script>
 <script>
     $(".classd1").click(function () {
+        var type = "";
         if ($(this).prop("checked") == true) {
-            var srt = $("#karbariFinal").val() + $(this).attr('id')+",";
-            $("#karbariFinal").val(srt);
-            $.ajax({
-                url: '/Home/setType',
-                dataType: 'html',
-                data: {
-                    srt: srt,
-                }
-            
-            })
-            
-        } else {
-            var srt = $("#karbariFinal").val().replace($(this).attr('id')+",",'') ;
-            $.ajax({
-                url: '/Home/setType',
-                dataType: 'html',
-                data: {
-                    srt: srt,
-                }
+           
+            type = "1";
 
-            })
+        } else {
+          
+            type = "0";
         }
-    })
-    $("#reloadList").click(function () {
-        $("#loadin").fadeIn();
+        var srt = $(this).attr('id');
+       
         $.ajax({
-            url: '/Home/getItemList',
+            url: '/Home/setType',
             dataType: 'html',
             data: {
-                page :"0",
+                srt: srt,
+                type: type
             },
-            success: function (data) {
+            success: function () {
+                
+            }
+        })
+    })
+    $("#reloadList").click(function () {
+        $("#loading").css("display", "block");
+
+      
+       
+        var ostan = $(".state").val();
+        var city = $(".cityinput").val();
+        var projectDate = $(".projectDate").val();
+        var metrajfrom = $("#metrajfrom").val();
+        var metrajTo = $("#metrajTo").val();
+        var darsad = $("#ex6SliderVal").text();
+        var mablaghvarizFrom = $("#mablaghvarizFrom").val();
+        var mablaghvarizTo = $("#mablaghvarizTo").val();
+        var mablaghGestFrom = $("#mablaghGestFrom").val();
+        var mablaghGestTo = $("#mablaghGestTo").val();
+        var mablaghKollFrom = $("#mablaghKollFrom").val();
+        var mablaghKollTo = $("#mablaghKollTo").val();
+        $.ajax({
+            url: '/Home/setCokieModel',
+            dataType: 'html',
+            data: {
+
+                ostan: ostan,
+                city: city,
+                projectDate: projectDate,
+                metrajfrom: metrajfrom,
+                metrajTo: metrajTo,
+                darsad: darsad,
+                mablaghvarizFrom: mablaghvarizFrom,
+                mablaghvarizTo: mablaghvarizTo,
+                mablaghGestFrom: mablaghGestFrom,
+                mablaghGestTo: mablaghGestTo,
+                mablaghKollFrom: mablaghKollFrom,
+                mablaghKollTo: mablaghKollTo
+
+            },
+            success: function () {
+
+                $.ajax({
+                    url: '/Home/getItemList',
+                    dataType: 'html',
+                    data: {
+                        page: "0",
+                    },
+                    success: function (data) {
+                        if (data != "") {
+
+                            $("#loading").css("display", "none");
+                            $("#mainHolder").html(data);
+                            var width = screen.width;
+                            $("#barmenu").css("background-color", "rgba(0, 0, 0, 0)")
+                            $("#barmenu").animate({
+                                'margin-right': number
+                            }, function () {
+                                $("#barmenu").css("display", "none");
+                                $("#body").css("overflow", "scroll");
+
+                            });
+                            $("body").css("overflow", "scroll");
+                        }
+                        else {
+                            $("#loading").css("display", "none");
+                        }
+                    }
+                })
+
                
-                if (data != "") {
-                    $("#loadin").fadeOut();
-                    $("#mainHolder").html(data);
-                }
 
             }
         })
     })
 </script>
+<script>
+
+
+    var list =  @Html.Raw(Json.Encode(@Model.data.liststate));
+    var products = {
+        data: list,
+        getValue: "title",
+        list: {
+            match: {
+                enabled: true
+            },
+            onClickEvent: function () {
+                $.each(list, function (index, item) {
+                    // access the properties of each user
+                    var ID = item.ID;
+                    var title = item.title;
+                    if (title == $(".state").val()) {
+                        $.ajax({
+                            url: '/Home/getLocation',
+                            dataType: 'html',
+                            data: {
+                                state_id: ID,
+                            },
+                            success: function (data) {
+                                
+                                var lst = JSON.parse(data);
+
+                                var cities = {
+                                    data: lst.data.listcity,
+                                    getValue: "title",
+                                    list: {
+                                        match: {
+                                            enabled: true
+                                        }
+                                        
+                                    }
+
+
+                                }
+                                $(".cityinput").easyAutocomplete(cities);
+                                $(".easy-autocomplete").css("width", "100%");
+
+                               
+
+
+
+                            }
+                        });
+
+                    }
+
+
+                });
+            }
+
+        },
+      
+    };
+    $(".state").easyAutocomplete(products);
+</script>
+<script>
+    $(".easy-autocomplete").css("width", "100%");
+</script>
+
+@*<script>
+    $(".karbaricheckbox").change(function () {
+      
+        var id = $(this).attr('id');
+        
+    })
+</script>*@

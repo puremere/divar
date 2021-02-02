@@ -1,13 +1,18 @@
 ﻿@model  divar.ViewModel.itemList.itemListVM
 @{
+
+<div style="display:none" id="changePage">@Model.data.hasnextpage</div> 
     if (@Model.data.listads.Count() > 0)
     {
+
+
         foreach (var item in @Model.data.listads)
         {
-            <div class="col-lg-4 col-md-6 col-sm-12 itemParent" id="@item.ID">
+
+            <div class="col-lg-4 col-md-6 col-sm-12 itemParent " id="@item.ID">
                 <div class="itemChild">
                     <p class="title">@item.title &nbsp; (@item.account_type)</p>
-                    <div class="itemContetn" >
+                    <div class="itemContetn">
                         <div class="imageHolder">
                             <img src="@item.image" />
 
@@ -23,29 +28,6 @@
                                 <p class="activ">@item.companyname</p>
 
                             </div>
-                            @*<div style="display:flex">
-                <div class="contentList">
-                    <p> تاریخ تحویل :</p>
-                    <p class="activ">@item.end_date</p>
-
-                </div>
-
-
-
-            </div>
-
-
-
-            <div style="display:flex">
-                <div class="contentList">
-                    <p> درصد پیشرفت  :</p>
-
-
-                </div>
-
-
-            </div>*@
-
 
                         </div>
 
@@ -54,7 +36,7 @@
                         <div style="width:70%; display:flex; align-items:center">
                             @*<p style="display:inline-block; width:43%;margin:0"> نوع کاربری : @item.account_type  </p>*@
                             <p style="display:inline-block; width:100%;margin:0"> تاریخ آگهی : @item.time  </p>
-                           
+
                         </div>
                         <div style="width:30%;display:flex; direction:ltr">
                             @{
@@ -68,13 +50,13 @@
                                 {
                                     <img class="itemimageRemove savedItem" id="@item.ID" src="~/images/saved.png" style="display:none;" />
                                     <img class="itemimageAdd unsavedItem" id="@item.ID" src="~/images/unsaved.png" style="" />
-                                    <div  style="margin-left:10px" class="progress-bar position" data-percent=@item.project_process_percentage></div>
+                                    <div style="margin-left:10px" class="progress-bar position" data-percent=@item.project_process_percentage></div>
                                 }
                             }
                         </div>
-                       
 
-                        
+
+
 
                     </div>
                 </div>
@@ -84,8 +66,11 @@
     }
     else
     {
-       <div style="padding:50px;text-align:center; border:1px solid #eee;border-radius:5px ">موردی برای نمایش وجود ندارد</div>
+        <div style="padding:50px;text-align:center; border:1px solid #eee;border-radius:5px ">موردی برای نمایش وجود ندارد</div>
     }
+
+
+
 
 
 
@@ -167,15 +152,7 @@
 
         });
     </script>
+
+
 }
 
-@{ 
-    int w = Request.Browser.ScreenPixelsWidth;
-    int h = Request.Browser.ScreenPixelsHeight;
-    if (Request.Browser.IsMobileDevice || (w < 720 && h > 720))
-    {
-        <script>
-
-        </script>
-    }
-}

@@ -152,12 +152,15 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Classes\customMethodes.cs" />
+    <Compile Include="Classes\dateTimeConvert.cs" />
     <Compile Include="Classes\multiPartUpload.cs" />
+    <Compile Include="Classes\numToText.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\companyInfoVM.cs" />
     <Compile Include="ViewModel\contentPageVM.cs" />
     <Compile Include="ViewModel\cookieVM.cs" />
     <Compile Include="ViewModel\createItemVM.cs" />
@@ -182,6 +185,7 @@
     <Content Include="Content\lightgallery.min.css" />
     <Content Include="Content\persian-datepicker.css" />
     <Content Include="Content\ProductListStyle.css" />
+    <Content Include="Content\toastr.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="fonts\webfonts\fa-brands-400.svg" />
@@ -308,6 +312,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\jquery.waypoints.min.js" />
     <Content Include="Scripts\lg-fullscreen.js" />
     <Content Include="Scripts\lg-thumbnail.js" />
     <Content Include="Scripts\lg-zoom.js" />
@@ -316,6 +321,7 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\persian-date.js" />
     <Content Include="Scripts\persian-datepicker.js" />
+    <Content Include="Scripts\toastr.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -340,6 +346,7 @@
     <Content Include="Views\Home\setting.cshtml" />
     <Content Include="Views\Home\content.cshtml" />
     <Content Include="Views\Shared\_pageContent.cshtml" />
+    <Content Include="Views\Shared\_companyInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
